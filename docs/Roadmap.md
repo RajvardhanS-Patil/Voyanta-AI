@@ -24,13 +24,13 @@ This document establishes the official development phases, deliverables, depende
 - **Dependencies**: Phase 2 authenticated sessions.
 - **Acceptance Criteria**: App successfully calls Gemini and parses the response into valid, typed Dart objects.
 
-### Phase 4: Trip Dashboard & Planner (Current)
+### Phase 4: Trip Dashboard & Planner (Completed)
 - **Objective**: Develop trip rendering widgets and day-by-day itineraries.
 - **Deliverables**: Trip creation wizard pages, day details dashboards, packing list generation displays.
 - **Dependencies**: Phase 3 AI prompt generators.
 - **Acceptance Criteria**: Users can create a trip, trigger AI itinerary generation, view days schedule, and toggle packing lists.
 
-### Phase 5: Maps & Geo-Spatial Queries
+### Phase 5: Maps & Geo-Spatial Queries (Current)
 - **Objective**: Integrate vector maps styles and display interactive itinerary pins.
 - **Deliverables**: Mapbox style integrations, marker clustering logic, coordinate collection mappings.
 - **Dependencies**: Phase 4 trip dashboards.

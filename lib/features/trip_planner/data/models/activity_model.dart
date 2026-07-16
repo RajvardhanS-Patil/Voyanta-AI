@@ -14,11 +14,11 @@ class ActivityModel extends Activity {
       time: json['time'] ?? '',
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      latitude: json['latitude'] is num 
-          ? (json['latitude'] as num).toDouble() 
+      latitude: json['latitude'] is num
+          ? (json['latitude'] as num).toDouble()
           : double.tryParse(json['latitude']?.toString() ?? '') ?? 0.0,
-      longitude: json['longitude'] is num 
-          ? (json['longitude'] as num).toDouble() 
+      longitude: json['longitude'] is num
+          ? (json['longitude'] as num).toDouble()
           : double.tryParse(json['longitude']?.toString() ?? '') ?? 0.0,
     );
   }
