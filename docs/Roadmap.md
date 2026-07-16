@@ -12,13 +12,13 @@ This document establishes the official development phases, deliverables, depende
 - **Dependencies**: None.
 - **Acceptance Criteria**: All files compiled cleanly, git commits pushed to remote GitHub origin.
 
-### Phase 2: Authentication & Onboarding (Current)
+### Phase 2: Authentication & Onboarding (Completed)
 - **Objective**: Establish secure user registration, token management, secure vaults, and password hashing loops.
 - **Deliverables**: Supabase Auth client bindings, login/sign-up forms UI widgets, biometric unlock configurations.
 - **Dependencies**: Phase 1 foundation modules.
 - **Acceptance Criteria**: Users can register and sign in. Tokens save to secure storage. Session resumes on cold start.
 
-### Phase 3: AI Core & Prompts Pipeline
+### Phase 3: AI Core & Prompts Pipeline (Current)
 - **Objective**: Establish Gemini API connection and structure itinerary JSON output models.
 - **Deliverables**: Gemini client service wrappers, prompt builder orchestrators, JSON schema parsing validation filters.
 - **Dependencies**: Phase 2 authenticated sessions.
