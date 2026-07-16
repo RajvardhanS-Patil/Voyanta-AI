@@ -42,19 +42,19 @@ This document establishes the official development phases, deliverables, depende
 - **Dependencies**: Phase 5 Maps.
 - **Acceptance Criteria**: App tracks user location, triggers arrivals when near an activity, and navigates externally.
 
-### Phase 7: Expense Ledger & Budgets (Current)
+### Phase 7: Expense Ledger & Budgets (Completed)
 - **Objective**: Develop logging panels to track travel spending.
 - **Deliverables**: Expense form overlays, categories budget lists, analytics progress bars.
 - **Dependencies**: Phase 2 secure databases.
 - **Acceptance Criteria**: Users can log transactions. App calculations update total trip cost averages and budget alert states.
 
-### Phase 7: Offline Capabilities & Cache Sync
+### Phase 8: Offline First Architecture & Cache Sync (Current)
 - **Objective**: Establish synchronization database pipelines.
 - **Deliverables**: Local Isar database storage tables, Sync Queue tables, network status listeners.
 - **Dependencies**: Phase 6 expense registers.
 - **Acceptance Criteria**: Data updates save to Isar when offline. Once online, Sync Manager pushes queue items automatically.
 
-### Phase 8: Visual Polish & Performance Tuning
+### Phase 9: Visual Polish & Performance Tuning
 - **Objective**: Smooth micro-animations and performance audits.
 - **Deliverables**: Glassmorphic panels, lazy list rendering setups, build bundle compression configurations.
 - **Dependencies**: All preceding phases.

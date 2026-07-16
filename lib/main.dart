@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/network/supabase_client.dart';
 import 'core/network/gemini_client.dart';
-import 'features/journey/presentation/screens/live_journey_screen.dart';
+import 'features/expenses/presentation/screens/expense_dashboard_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +31,7 @@ class VoyantaApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: const LiveJourneyScreen(),
+      home: const ExpenseDashboardScreen(),
     );
   }
 }
