@@ -6,13 +6,13 @@ This document establishes the official development phases, deliverables, depende
 
 ## Development Phases
 
-### Phase 1: Project Foundation (Current)
+### Phase 1: Project Foundation (Completed)
 - **Objective**: Set up code style conventions, architect guidelines, folder layout structures, git repositories, and dependencies.
 - **Deliverables**: Complete documentation suite under `/docs`, root repository `README.md`, `.gitignore`, and initialized git hooks.
 - **Dependencies**: None.
 - **Acceptance Criteria**: All files compiled cleanly, git commits pushed to remote GitHub origin.
 
-### Phase 2: Authentication & Onboarding
+### Phase 2: Authentication & Onboarding (Current)
 - **Objective**: Establish secure user registration, token management, secure vaults, and password hashing loops.
 - **Deliverables**: Supabase Auth client bindings, login/sign-up forms UI widgets, biometric unlock configurations.
 - **Dependencies**: Phase 1 foundation modules.
