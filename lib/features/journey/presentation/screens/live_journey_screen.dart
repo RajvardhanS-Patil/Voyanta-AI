@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,37 +18,34 @@ class LiveJourneyScreen extends ConsumerStatefulWidget {
 }
 
 class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Bootstrap the Journey Engine with a test itinerary on load
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(journeyControllerProvider.notifier)
-          .startJourney(
-            const TripItinerary(
-              dayNumber: 1,
-              theme: 'City Highlights',
-              activities: [
-                Activity(
-                  time: '10:00 AM',
-                  title: 'Empire State Building',
-                  description: 'Observation deck',
-                  latitude: 40.7484,
-                  longitude: -73.9857,
-                ),
-                Activity(
-                  time: '1:00 PM',
-                  title: 'Central Park',
-                  description: 'Lunch and walk',
-                  latitude: 40.7812,
-                  longitude: -73.9665,
-                ),
-              ],
-            ),
-          );
-    });
-  }
+  // Demo itinerary to seed the engine
+  static const _testItinerary = TripItinerary(
+    dayNumber: 1,
+    theme: 'Manhattan Skyline & Park Tour',
+    activities: [
+      Activity(
+        time: '10:00 AM',
+        title: 'Empire State Building',
+        description: 'Take in the 360-degree observation deck views.',
+        latitude: 40.7484,
+        longitude: -73.9857,
+      ),
+      Activity(
+        time: '1:00 PM',
+        title: 'Central Park Carousel',
+        description: 'Relaxing ride and stroll through the mall.',
+        latitude: 40.7712,
+        longitude: -73.9725,
+      ),
+      Activity(
+        time: '4:00 PM',
+        title: 'Metropolitan Museum of Art',
+        description: 'Explore historical exhibits and rooftop sculptures.',
+        latitude: 40.7794,
+        longitude: -73.9632,
+      ),
+    ],
+  );
 
   Future<void> _launchMapsIntent(double lat, double lng) async {
     final String googleMapsUrl = 'google.navigation:q=$lat,$lng&mode=d';
@@ -58,7 +56,6 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
-      // Fallback gracefully to the web platform
       final webUri = Uri.parse(
         'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng',
       );
@@ -69,120 +66,414 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
   @override
   Widget build(BuildContext context) {
     final journeyState = ref.watch(journeyControllerProvider);
+
+    // If journey is not active, display the Start Dashboard / Permissions controller
+    if (!journeyState.hasActiveJourney) {
+      return _buildStartScreen(journeyState);
+    }
+
     final isArrived = journeyState.status == JourneyStatus.arrived;
+    final totalActivities = journeyState.activeItinerary?.activities.length ?? 1;
+    final completedCount = journeyState.currentActivityIndex;
+    final progressFraction = completedCount / totalActivities;
 
     return Scaffold(
+      backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: const Icon(Icons.location_on, color: Colors.tealAccent),
         title: const Text(
-          'Live Journey',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          'Live Route Tracker',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Outfit'),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.stop_circle_outlined, color: Colors.redAccent, size: 28),
+            onPressed: () {
+              ref.read(journeyControllerProvider.notifier).endJourney();
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Stack(
         children: [
-          // Leverage the existing offline maps integration
+          // Underlying Mapbox Canvas
           const ItineraryMapView(),
 
-          // Glassmorphic real-time overlay
+          // Glassmorphic status panel
           if (journeyState.currentActivity != null)
             Positioned(
-              bottom: 40,
-              left: 20,
-              right: 20,
+              bottom: 160, // Shifts up to leave space for the bottom timeline sheet
+              left: 16,
+              right: 16,
               child: _buildGlassPanel(journeyState, isArrived),
             ),
+
+          // Draggable Bottom Timeline & Trip Progress Indicator
+          _buildDraggableTimeline(journeyState, progressFraction, completedCount, totalActivities),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStartScreen(JourneyState state) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F172A),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.explore_outlined, color: Colors.tealAccent, size: 80),
+                const SizedBox(height: 24),
+                const Text(
+                  'Live Journey Engine',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Outfit',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Transform your static travel plan into a real-time guided tour with automatic arrival alerts and live GPS tracking.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white70, fontSize: 14, fontFamily: 'Inter', height: 1.5),
+                ),
+                const SizedBox(height: 32),
+
+                // Graceful Permission Warning overlay if location check failed
+                if (state.permissionDenied)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 24),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5)),
+                    ),
+                    child: const Column(
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+                            SizedBox(width: 8),
+                            Text(
+                              'Location Access Denied',
+                              style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Voyanta requires background & foreground GPS permission to animate your route and trigger geofence arrivals. Please enable it in settings or click Grant below.',
+                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // Background location support notice
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 32),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.security, color: Colors.tealAccent, size: 20),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Equipped with background tracking capabilities. Voyanta safely monitors progress even when your screen is locked.',
+                          style: TextStyle(color: Colors.white60, fontSize: 12),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.tealAccent,
+                      foregroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                    ),
+                    onPressed: () {
+                      ref.read(journeyControllerProvider.notifier).startJourney(_testItinerary);
+                    },
+                    child: const Text(
+                      'Start Journey',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Outfit'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
 
   Widget _buildGlassPanel(JourneyState state, bool isArrived) {
     final activity = state.currentActivity!;
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.teal.withValues(alpha: 0.2),
-            blurRadius: 20,
-            spreadRadius: 2,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.65),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.teal.withValues(alpha: 0.15),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            isArrived ? 'Arrived!' : 'Heading to',
-            style: TextStyle(
-              color: isArrived ? Colors.tealAccent : Colors.white54,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            activity.title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${(state.distanceToNextMeters / 1000).toStringAsFixed(1)} km away • ${state.etaMinutes} min',
-            style: const TextStyle(color: Colors.white70),
-          ),
-          const SizedBox(height: 16),
-          Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  icon: const Icon(Icons.navigation),
-                  label: const Text('Navigate'),
-                  onPressed: () =>
-                      _launchMapsIntent(activity.latitude, activity.longitude),
+              Text(
+                isArrived ? '🎯 ARRIVED AT DESTINATION' : '⏳ ACTIVE ROUTE STATE',
+                style: TextStyle(
+                  color: isArrived ? Colors.tealAccent : Colors.white54,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                  fontSize: 12,
                 ),
               ),
-              if (isArrived) ...[
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white12,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+              const SizedBox(height: 8),
+              Text(
+                activity.title,
+                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${(state.distanceToNextMeters / 1000).toStringAsFixed(2)} km away • ETA: ${state.etaMinutes} mins',
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      icon: const Icon(Icons.navigation),
+                      label: const Text('Navigate'),
+                      onPressed: () => _launchMapsIntent(activity.latitude, activity.longitude),
                     ),
-                    icon: const Icon(Icons.check_circle_outline),
-                    label: const Text('Next'),
-                    onPressed: () {
-                      ref
-                          .read(journeyControllerProvider.notifier)
-                          .advanceToNextActivity();
+                  ),
+                  if (isArrived) ...[
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white12,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        icon: const Icon(Icons.check_circle_outline),
+                        label: const Text('Complete'),
+                        onPressed: () {
+                          ref.read(journeyControllerProvider.notifier).advanceToNextActivity();
+                        },
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDraggableTimeline(
+    JourneyState state,
+    double progress,
+    int completed,
+    int total,
+  ) {
+    final activities = state.activeItinerary?.activities ?? [];
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.18,
+      minChildSize: 0.18,
+      maxChildSize: 0.55,
+      builder: (context, scrollController) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E293B).withValues(alpha: 0.9), // Glass panel
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              ),
+              child: ListView(
+                controller: scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                children: [
+                  // Center drag indicator line
+                  Align(
+                    alignment: Alignment.center,
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.white30,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Progress Bar Block
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Journey Timeline',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+                      Text(
+                        '$completed / $total completed',
+                        style: const TextStyle(color: Colors.tealAccent, fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: Colors.white10,
+                      color: Colors.tealAccent,
+                      minHeight: 6,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Timeline activities checklist
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: activities.length,
+                    itemBuilder: (context, index) {
+                      final act = activities[index];
+                      final isCompleted = index < state.currentActivityIndex;
+                      final isActive = index == state.currentActivityIndex;
+
+                      return _buildTimelineItem(act, isCompleted, isActive, index == activities.length - 1);
                     },
                   ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTimelineItem(Activity activity, bool isCompleted, bool isActive, bool isLast) {
+    Color dotColor = Colors.white24;
+    IconData icon = Icons.circle_outlined;
+    TextStyle titleStyle = const TextStyle(color: Colors.white70, fontSize: 14);
+
+    if (isCompleted) {
+      dotColor = Colors.tealAccent;
+      icon = Icons.check_circle;
+      titleStyle = const TextStyle(color: Colors.white38, fontSize: 14, decoration: TextDecoration.lineThrough);
+    } else if (isActive) {
+      dotColor = Colors.purpleAccent;
+      icon = Icons.gps_fixed;
+      titleStyle = const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+    }
+
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left timeline visual track
+          Column(
+            children: [
+              Icon(icon, color: dotColor, size: 20),
+              if (!isLast)
+                Expanded(
+                  child: Container(
+                    width: 2,
+                    color: isCompleted ? Colors.tealAccent : Colors.white12,
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                  ),
                 ),
-              ],
             ],
+          ),
+          const SizedBox(width: 16),
+
+          // Content body
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        activity.title,
+                        style: titleStyle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Text(
+                      activity.time,
+                      style: TextStyle(
+                        color: isActive ? Colors.purpleAccent : Colors.white30,
+                        fontSize: 12,
+                        fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  activity.description,
+                  style: const TextStyle(color: Colors.white54, fontSize: 11),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ],
       ),

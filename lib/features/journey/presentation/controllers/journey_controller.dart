@@ -11,15 +11,12 @@ class JourneyController extends Notifier<JourneyState> {
   StreamSubscription<Position>? _positionSubscription;
   late final LocationRepository _locationRepo;
   late final CalculateEtaUseCase _calculateEta;
-  TripItinerary? _activeItinerary;
-  int _currentActivityIndex = 0;
 
   @override
   JourneyState build() {
     _locationRepo = ref.read(locationRepositoryProvider);
     _calculateEta = ref.read(calculateEtaUseCaseProvider);
 
-    // Dispose the subscription when the notifier is destroyed
     ref.onDispose(() {
       _positionSubscription?.cancel();
     });
@@ -28,43 +25,46 @@ class JourneyController extends Notifier<JourneyState> {
   }
 
   Future<void> startJourney(TripItinerary itinerary) async {
-    _activeItinerary = itinerary;
-    _currentActivityIndex = 0;
-
-    if (_activeItinerary!.activities.isEmpty) return;
+    if (itinerary.activities.isEmpty) return;
 
     final hasPermission = await _locationRepo.requestPermissions();
     if (!hasPermission) {
-      // Without location permissions, the live engine cannot function.
+      state = state.copyWith(
+        status: JourneyStatus.idle,
+        permissionDenied: true,
+      );
       return;
     }
 
-    state = state.copyWith(status: JourneyStatus.navigating);
+    state = JourneyState(
+      activeItinerary: itinerary,
+      currentActivityIndex: 0,
+      status: JourneyStatus.navigating,
+      permissionDenied: false,
+    );
 
-    // Bootstrap with the last known position to prevent initial blank states
     final lastKnown = await _locationRepo.getLastKnownPosition();
     if (lastKnown != null) {
       _updateStateWithPosition(lastKnown);
     }
 
-    // Subscribe to continuous GPS updates (filtered every 10 meters)
     _positionSubscription?.cancel();
-    _positionSubscription = _locationRepo.getLocationStream().listen((
-      position,
-    ) {
+    _positionSubscription = _locationRepo.getLocationStream().listen((position) {
       _updateStateWithPosition(position);
     });
   }
 
   void _updateStateWithPosition(Position pos) {
-    if (_activeItinerary == null ||
-        _currentActivityIndex >= _activeItinerary!.activities.length) {
+    final itinerary = state.activeItinerary;
+    final index = state.currentActivityIndex;
+
+    if (itinerary == null || index >= itinerary.activities.length) {
       state = state.copyWith(status: JourneyStatus.completed);
       _positionSubscription?.cancel();
       return;
     }
 
-    final targetActivity = _activeItinerary!.activities[_currentActivityIndex];
+    final targetActivity = itinerary.activities[index];
 
     final distanceMeters = Geolocator.distanceBetween(
       pos.latitude,
@@ -75,14 +75,12 @@ class JourneyController extends Notifier<JourneyState> {
 
     final eta = _calculateEta(distanceMeters: distanceMeters);
 
-    // Core Geofencing Architecture: Trip triggers Arrival when within 150 meters
     JourneyStatus newStatus = JourneyStatus.navigating;
     if (distanceMeters <= 150) {
       newStatus = JourneyStatus.arrived;
     }
 
     state = state.copyWith(
-      currentActivity: targetActivity,
       currentLatitude: pos.latitude,
       currentLongitude: pos.longitude,
       distanceToNextMeters: distanceMeters,
@@ -92,16 +90,27 @@ class JourneyController extends Notifier<JourneyState> {
   }
 
   void advanceToNextActivity() {
-    if (_activeItinerary == null) return;
+    final itinerary = state.activeItinerary;
+    if (itinerary == null) return;
 
-    _currentActivityIndex++;
-    if (_currentActivityIndex >= _activeItinerary!.activities.length) {
-      state = state.copyWith(status: JourneyStatus.completed);
+    final nextIndex = state.currentActivityIndex + 1;
+    if (nextIndex >= itinerary.activities.length) {
+      state = state.copyWith(
+        currentActivityIndex: nextIndex,
+        status: JourneyStatus.completed,
+      );
       _positionSubscription?.cancel();
     } else {
-      // Revert status to navigating; the next GPS tick will recalibrate the state natively
-      state = state.copyWith(status: JourneyStatus.navigating);
+      state = state.copyWith(
+        currentActivityIndex: nextIndex,
+        status: JourneyStatus.navigating,
+      );
     }
+  }
+
+  void endJourney() {
+    _positionSubscription?.cancel();
+    state = const JourneyState();
   }
 }
 

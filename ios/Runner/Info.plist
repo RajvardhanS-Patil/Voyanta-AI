@@ -4,6 +4,14 @@
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Voyanta AI requires access to your location to track your journey and provide live ETA updates.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Voyanta AI requires access to your location in the background to send arrival notifications and track your journey milestones.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Voyanta AI requires access to your location in the background to send arrival notifications and track your journey milestones.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

@@ -8,7 +8,7 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: VoyantaApp()));
 
     // Verify that the companion screen title is present
-    expect(find.text('Voyanta AI Companion'), findsOneWidget);
+    expect(find.text('Live Journey Engine'), findsOneWidget);
 
     // Wait for async mock repository timers to complete to avoid pending timer leaks
     await tester.pump(const Duration(milliseconds: 500));
