@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/network/supabase_client.dart';
+import 'core/network/gemini_client.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
 
 void main() async {
@@ -11,8 +12,9 @@ void main() async {
   // Load environment variables
   await dotenv.load(fileName: ".env");
 
-  // Initialize Supabase
+  // Initialize Networks
   await SupabaseClientManager.initialize();
+  GeminiClientManager.initialize();
 
   runApp(const ProviderScope(child: VoyantaApp()));
 }

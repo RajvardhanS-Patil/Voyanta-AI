@@ -18,13 +18,13 @@ This document establishes the official development phases, deliverables, depende
 - **Dependencies**: Phase 1 foundation modules.
 - **Acceptance Criteria**: Users can register and sign in. Tokens save to secure storage. Session resumes on cold start.
 
-### Phase 3: AI Core & Prompts Pipeline (Current)
+### Phase 3: AI Core & Prompts Pipeline (Completed)
 - **Objective**: Establish Gemini API connection and structure itinerary JSON output models.
 - **Deliverables**: Gemini client service wrappers, prompt builder orchestrators, JSON schema parsing validation filters.
 - **Dependencies**: Phase 2 authenticated sessions.
-- **Acceptance Criteria**: System parses Gemini JSON streams correctly. Invalid responses are caught and retried automatically.
+- **Acceptance Criteria**: App successfully calls Gemini and parses the response into valid, typed Dart objects.
 
-### Phase 4: Trip Dashboard & Planner
+### Phase 4: Trip Dashboard & Planner (Current)
 - **Objective**: Develop trip rendering widgets and day-by-day itineraries.
 - **Deliverables**: Trip creation wizard pages, day details dashboards, packing list generation displays.
 - **Dependencies**: Phase 3 AI prompt generators.
