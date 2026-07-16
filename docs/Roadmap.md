@@ -30,13 +30,19 @@ This document establishes the official development phases, deliverables, depende
 - **Dependencies**: Phase 3 AI prompt generators.
 - **Acceptance Criteria**: Users can create a trip, trigger AI itinerary generation, view days schedule, and toggle packing lists.
 
-### Phase 5: Maps & Geo-Spatial Queries (Current)
+### Phase 5: Maps & Geo-Spatial Queries (Completed)
 - **Objective**: Integrate vector maps styles and display interactive itinerary pins.
 - **Deliverables**: Mapbox style integrations, marker clustering logic, coordinate collection mappings.
 - **Dependencies**: Phase 4 trip dashboards.
 - **Acceptance Criteria**: Maps render with custom markers. Clustered badges display when pins are grouped within proximity.
 
-### Phase 6: Expense Ledger & Budgets
+### Phase 6: Live Journey Engine (Completed)
+- **Objective**: Transform static itineraries into a live travel experience.
+- **Deliverables**: Real-time GPS tracking, geofenced arrival detection, dynamic ETAs, and Google Maps intent integration.
+- **Dependencies**: Phase 5 Maps.
+- **Acceptance Criteria**: App tracks user location, triggers arrivals when near an activity, and navigates externally.
+
+### Phase 7: Expense Ledger & Budgets (Current)
 - **Objective**: Develop logging panels to track travel spending.
 - **Deliverables**: Expense form overlays, categories budget lists, analytics progress bars.
 - **Dependencies**: Phase 2 secure databases.
