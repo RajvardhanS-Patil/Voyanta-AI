@@ -9,6 +9,8 @@ import 'package:voyanta_ai/features/journey/domain/entities/journey_state.dart';
 import 'package:voyanta_ai/features/journey/presentation/controllers/journey_controller.dart';
 import 'package:voyanta_ai/features/trip_planner/domain/entities/trip_itinerary.dart';
 import 'package:voyanta_ai/features/trip_planner/domain/entities/activity.dart';
+import 'package:voyanta_ai/features/intelligence/presentation/controllers/intelligence_providers.dart';
+import 'package:voyanta_ai/features/intelligence/presentation/widgets/recommendation_card.dart';
 
 class LiveJourneyScreen extends ConsumerStatefulWidget {
   const LiveJourneyScreen({super.key});
@@ -76,6 +78,7 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
     final totalActivities = journeyState.activeItinerary?.activities.length ?? 1;
     final completedCount = journeyState.currentActivityIndex;
     final progressFraction = completedCount / totalActivities;
+    final recommendations = ref.watch(activeRecommendationsProvider);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -103,14 +106,34 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
           // Underlying Mapbox Canvas
           const ItineraryMapView(),
 
-          // Glassmorphic status panel
-          if (journeyState.currentActivity != null)
+          if (journeyState.currentActivity != null) ...[
+            // Proactive Travel Intelligence Recommendations
+            if (recommendations.isNotEmpty)
+              Positioned(
+                bottom: 335,
+                left: 0,
+                right: 0,
+                child: SizedBox(
+                  height: 120,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    itemCount: recommendations.length,
+                    itemBuilder: (context, index) {
+                      return RecommendationCard(recommendation: recommendations[index]);
+                    },
+                  ),
+                ),
+              ),
+
+            // Glassmorphic status panel
             Positioned(
               bottom: 160, // Shifts up to leave space for the bottom timeline sheet
               left: 16,
               right: 16,
               child: _buildGlassPanel(journeyState, isArrived),
             ),
+          ],
 
           // Draggable Bottom Timeline & Trip Progress Indicator
           _buildDraggableTimeline(journeyState, progressFraction, completedCount, totalActivities),
