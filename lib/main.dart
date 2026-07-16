@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/network/supabase_client.dart';
 import 'core/network/gemini_client.dart';
+import 'core/database/isar_service.dart';
 import 'features/journey/presentation/screens/live_journey_screen.dart';
 
 void main() async {
@@ -11,6 +12,9 @@ void main() async {
 
   // Load environment variables
   await dotenv.load(fileName: ".env");
+
+  // Initialize Persistent Local Database
+  await IsarService.initialize();
 
   // Initialize Networks
   await SupabaseClientManager.initialize();

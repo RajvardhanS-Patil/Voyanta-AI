@@ -11,6 +11,7 @@ import 'package:voyanta_ai/features/trip_planner/domain/entities/trip_itinerary.
 import 'package:voyanta_ai/features/trip_planner/domain/entities/activity.dart';
 import 'package:voyanta_ai/features/intelligence/presentation/controllers/intelligence_providers.dart';
 import 'package:voyanta_ai/features/intelligence/presentation/widgets/recommendation_card.dart';
+import 'package:voyanta_ai/core/widgets/sync_status_banner.dart';
 
 class LiveJourneyScreen extends ConsumerStatefulWidget {
   const LiveJourneyScreen({super.key});
@@ -105,6 +106,14 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
         children: [
           // Underlying Mapbox Canvas
           const ItineraryMapView(),
+
+          // Connectivity / action queue sync status banner
+          const Positioned(
+            top: 100,
+            left: 16,
+            right: 16,
+            child: SyncStatusBanner(),
+          ),
 
           if (journeyState.currentActivity != null) ...[
             // Proactive Travel Intelligence Recommendations

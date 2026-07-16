@@ -47,3 +47,8 @@ ios/Flutter/flutter_export_environment.sh
 *.swp
 .DS_Store
 Thumbs.db
+isar.dll
+*.dll
+*.so
+*.dylib
+.isar/
