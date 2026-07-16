@@ -7,7 +7,10 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const ProviderScope(child: VoyantaApp()));
 
-    // Verify that the login screen title is present
-    expect(find.text('Welcome to Voyanta AI'), findsOneWidget);
+    // Verify that the companion screen title is present
+    expect(find.text('Voyanta AI Companion'), findsOneWidget);
+
+    // Wait for async mock repository timers to complete to avoid pending timer leaks
+    await tester.pump(const Duration(milliseconds: 500));
   });
 }

@@ -10,7 +10,7 @@ class SupabaseClientManager {
       throw Exception('Missing SUPABASE_URL or SUPABASE_ANON_KEY in .env file');
     }
 
-    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+    await Supabase.initialize(url: supabaseUrl, publishableKey: supabaseAnonKey);
   }
 
   static SupabaseClient get client => Supabase.instance.client;
