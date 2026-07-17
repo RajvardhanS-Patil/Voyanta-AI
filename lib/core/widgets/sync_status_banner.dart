@@ -27,16 +27,16 @@ class SyncStatusBanner extends ConsumerWidget {
           return const SizedBox.shrink();
         }
 
-        Color bannerColor = Colors.orangeAccent.withOpacity(0.15);
+        Color bannerColor = Colors.orangeAccent.withValues(alpha: 0.15);
         String label = "Weak connection speed";
         IconData icon = Icons.signal_wifi_bad_outlined;
 
         if (isOffline) {
-          bannerColor = Colors.redAccent.withOpacity(0.15);
+          bannerColor = Colors.redAccent.withValues(alpha: 0.15);
           label = "Offline Mode active";
           icon = Icons.cloud_off_outlined;
         } else if (pendingCount > 0) {
-          bannerColor = Colors.tealAccent.withOpacity(0.15);
+          bannerColor = Colors.tealAccent.withValues(alpha: 0.15);
           label = "Syncing actions to remote server...";
           icon = Icons.sync_outlined;
         }

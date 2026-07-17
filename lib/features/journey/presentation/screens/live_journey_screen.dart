@@ -50,36 +50,19 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
     ],
   );
 
-  Future<void> _launchMapsIntent(double lat, double lng) async {
-    final String googleMapsUrl = 'google.navigation:q=$lat,$lng&mode=d';
-    final String appleMapsUrl = 'maps://?daddr=$lat,$lng&dirflg=d';
-
-    final uri = Uri.parse(Platform.isIOS ? appleMapsUrl : googleMapsUrl);
-
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    } else {
-      final webUri = Uri.parse(
-        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng',
-      );
-      await launchUrl(webUri);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final journeyState = ref.watch(journeyControllerProvider);
+    // Only rebuild LiveJourneyScreen when hasActiveJourney changes
+    final hasActiveJourney = ref.watch(
+      journeyControllerProvider.select((state) => state.hasActiveJourney),
+    );
+    final recommendations = ref.watch(activeRecommendationsProvider);
 
     // If journey is not active, display the Start Dashboard / Permissions controller
-    if (!journeyState.hasActiveJourney) {
+    if (!hasActiveJourney) {
+      final journeyState = ref.read(journeyControllerProvider); // read once for start screen
       return _buildStartScreen(journeyState);
     }
-
-    final isArrived = journeyState.status == JourneyStatus.arrived;
-    final totalActivities = journeyState.activeItinerary?.activities.length ?? 1;
-    final completedCount = journeyState.currentActivityIndex;
-    final progressFraction = completedCount / totalActivities;
-    final recommendations = ref.watch(activeRecommendationsProvider);
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -115,37 +98,35 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
             child: SyncStatusBanner(),
           ),
 
-          if (journeyState.currentActivity != null) ...[
-            // Proactive Travel Intelligence Recommendations
-            if (recommendations.isNotEmpty)
-              Positioned(
-                bottom: 335,
-                left: 0,
-                right: 0,
-                child: SizedBox(
-                  height: 120,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    itemCount: recommendations.length,
-                    itemBuilder: (context, index) {
-                      return RecommendationCard(recommendation: recommendations[index]);
-                    },
-                  ),
+          // Proactive Travel Intelligence Recommendations
+          if (recommendations.isNotEmpty)
+            Positioned(
+              bottom: 335,
+              left: 0,
+              right: 0,
+              child: SizedBox(
+                height: 120,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  itemCount: recommendations.length,
+                  itemBuilder: (context, index) {
+                    return RecommendationCard(recommendation: recommendations[index]);
+                  },
                 ),
               ),
-
-            // Glassmorphic status panel
-            Positioned(
-              bottom: 160, // Shifts up to leave space for the bottom timeline sheet
-              left: 16,
-              right: 16,
-              child: _buildGlassPanel(journeyState, isArrived),
             ),
-          ],
+
+          // Glassmorphic status panel
+          const Positioned(
+            bottom: 160,
+            left: 16,
+            right: 16,
+            child: _ActiveJourneyGlassPanel(),
+          ),
 
           // Draggable Bottom Timeline & Trip Progress Indicator
-          _buildDraggableTimeline(journeyState, progressFraction, completedCount, totalActivities),
+          const _DraggableTimelineSheet(),
         ],
       ),
     );
@@ -259,8 +240,33 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
       ),
     );
   }
+}
 
-  Widget _buildGlassPanel(JourneyState state, bool isArrived) {
+class _ActiveJourneyGlassPanel extends ConsumerWidget {
+  const _ActiveJourneyGlassPanel();
+
+  Future<void> _launchMapsIntent(double lat, double lng) async {
+    final String googleMapsUrl = 'google.navigation:q=$lat,$lng&mode=d';
+    final String appleMapsUrl = 'maps://?daddr=$lat,$lng&dirflg=d';
+
+    final uri = Uri.parse(Platform.isIOS ? appleMapsUrl : googleMapsUrl);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else {
+      final webUri = Uri.parse(
+        'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng',
+      );
+      await launchUrl(webUri);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(journeyControllerProvider);
+    if (state.currentActivity == null) return const SizedBox.shrink();
+
+    final isArrived = state.status == JourneyStatus.arrived;
     final activity = state.currentActivity!;
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
@@ -345,14 +351,20 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
       ),
     );
   }
+}
 
-  Widget _buildDraggableTimeline(
-    JourneyState state,
-    double progress,
-    int completed,
-    int total,
-  ) {
-    final activities = state.activeItinerary?.activities ?? [];
+class _DraggableTimelineSheet extends ConsumerWidget {
+  const _DraggableTimelineSheet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activeItinerary = ref.watch(journeyControllerProvider.select((s) => s.activeItinerary));
+    final currentActivityIndex = ref.watch(journeyControllerProvider.select((s) => s.currentActivityIndex));
+    
+    final totalActivities = activeItinerary?.activities.length ?? 1;
+    final completedCount = currentActivityIndex;
+    final progressFraction = completedCount / totalActivities;
+    final activities = activeItinerary?.activities ?? [];
 
     return DraggableScrollableSheet(
       initialChildSize: 0.18,
@@ -396,7 +408,7 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
                         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       Text(
-                        '$completed / $total completed',
+                        '$completedCount / $totalActivities completed',
                         style: const TextStyle(color: Colors.tealAccent, fontSize: 12, fontWeight: FontWeight.w600),
                       ),
                     ],
@@ -405,7 +417,7 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: progress,
+                      value: progressFraction,
                       backgroundColor: Colors.white10,
                       color: Colors.tealAccent,
                       minHeight: 6,
@@ -420,8 +432,8 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
                     itemCount: activities.length,
                     itemBuilder: (context, index) {
                       final act = activities[index];
-                      final isCompleted = index < state.currentActivityIndex;
-                      final isActive = index == state.currentActivityIndex;
+                      final isCompleted = index < currentActivityIndex;
+                      final isActive = index == currentActivityIndex;
 
                       return _buildTimelineItem(act, isCompleted, isActive, index == activities.length - 1);
                     },

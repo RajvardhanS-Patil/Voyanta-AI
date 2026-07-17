@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/network/supabase_client.dart';
 import 'core/network/gemini_client.dart';
 import 'core/database/isar_service.dart';
-import 'features/journey/presentation/screens/live_journey_screen.dart';
+import 'core/routes/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,19 +23,21 @@ void main() async {
   runApp(const ProviderScope(child: VoyantaApp()));
 }
 
-class VoyantaApp extends StatelessWidget {
+class VoyantaApp extends ConsumerWidget {
   const VoyantaApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+    
+    return MaterialApp.router(
       title: 'Voyanta AI',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: const LiveJourneyScreen(),
+      routerConfig: router,
     );
   }
 }

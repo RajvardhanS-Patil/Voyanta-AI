@@ -122,11 +122,22 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
     final budgetCalculator = ref.read(calculateBudgetHealthUseCaseProvider);
     final budgetStatus = budgetCalculator(expenses);
 
-    const destination = "New York City";
-    const theme = "City Highlights";
-    const dayNum = 1;
+    final itinerary = journeyState.activeItinerary;
+    
+    final destination = itinerary?.theme ?? "Unknown Destination";
+    final theme = itinerary?.theme ?? "General Travel";
+    final dayNum = itinerary?.dayNumber ?? 1;
 
-    final nextActivity = journeyState.currentActivity?.title ?? "Empire State Building";
+    final completedActivities = <String>[];
+    if (itinerary != null) {
+      for (int i = 0; i < journeyState.currentActivityIndex; i++) {
+        if (i < itinerary.activities.length) {
+          completedActivities.add(itinerary.activities[i].title);
+        }
+      }
+    }
+
+    final nextActivity = journeyState.currentActivity?.title ?? "None";
     final nextDistance = journeyState.distanceToNextMeters / 1000.0;
     final nextEta = journeyState.etaMinutes;
 
@@ -134,13 +145,13 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
       activeTripDestination: destination,
       activeTripTheme: theme,
       activeTripDayNumber: dayNum,
-      completedActivityTitles: const ["Times Square Arrival Walk"],
+      completedActivityTitles: completedActivities,
       nextActivityTitle: nextActivity,
-      nextActivityDistanceKm: nextDistance > 0 ? nextDistance : 1.8,
-      nextActivityEtaMinutes: nextEta > 0 ? nextEta : 12,
+      nextActivityDistanceKm: nextDistance,
+      nextActivityEtaMinutes: nextEta,
       totalBudget: budgetStatus.totalBudget,
       totalSpent: budgetStatus.currentSpent,
-      weatherInfo: "Sunny, 22°C",
+      weatherInfo: "Showers & Rainy", // Mock shared with intelligence
     );
   }
 }
