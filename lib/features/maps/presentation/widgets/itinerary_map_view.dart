@@ -5,6 +5,7 @@ import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:voyanta_ai/features/journey/presentation/controllers/journey_controller.dart';
 import 'package:voyanta_ai/features/journey/domain/entities/journey_state.dart';
 import '../controllers/map_controller.dart';
+import 'package:voyanta_ai/core/ux/shimmer_loader.dart';
 
 class ItineraryMapView extends ConsumerStatefulWidget {
   const ItineraryMapView({super.key});
@@ -137,19 +138,21 @@ class _ItineraryMapViewState extends ConsumerState<ItineraryMapView> {
     });
 
     if (publicToken == null || publicToken.isEmpty || publicToken.startsWith('mock')) {
-      return Container(
-        color: Colors.grey[900],
-        child: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.map_outlined, color: Colors.white54, size: 48),
-              SizedBox(height: 16),
-              Text(
-                'Mapbox Token Required',
-                style: TextStyle(color: Colors.white70),
-              ),
-            ],
+      return ShimmerLoader(
+        child: Container(
+          color: const Color(0xFF1E293B),
+          child: const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.map_outlined, color: Colors.white54, size: 64),
+                SizedBox(height: 16),
+                Text(
+                  'Loading Map Data...',
+                  style: TextStyle(color: Colors.white70, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
         ),
       );

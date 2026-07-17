@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voyanta_ai/core/ux/voyanta_button.dart';
 
 import '../controllers/auth_controller.dart';
 import '../widgets/auth_text_field.dart';
@@ -115,33 +116,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           : null,
                     ),
                     const SizedBox(height: 32),
-                    ElevatedButton(
+                    VoyantaButton(
+                      label: 'Sign In',
                       onPressed: authState.isLoading ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.tealAccent.shade400,
-                        foregroundColor: Colors.black87,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: authState.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.black87,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text(
-                              'Sign In',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                      isLoading: authState.isLoading,
                     ),
                     const SizedBox(height: 24),
                     TextButton(

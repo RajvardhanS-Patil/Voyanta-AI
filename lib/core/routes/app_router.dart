@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../features/auth/presentation/controllers/auth_controller.dart';
+
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/journey/presentation/screens/live_journey_screen.dart';
 import '../../features/companion/presentation/screens/companion_screen.dart';
@@ -9,7 +9,7 @@ import '../../features/expenses/presentation/screens/expense_dashboard_screen.da
 import '../widgets/dashboard_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateChangesProvider);
+  // final authState = ref.watch(authStateChangesProvider);
 
   return GoRouter(
     initialLocation: '/',

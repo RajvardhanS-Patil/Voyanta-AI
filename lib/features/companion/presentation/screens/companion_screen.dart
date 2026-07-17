@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voyanta_ai/features/companion/presentation/controllers/companion_controller.dart';
+import 'package:voyanta_ai/core/ux/shimmer_loader.dart';
+import 'package:voyanta_ai/core/ux/empty_state_view.dart';
+import 'package:voyanta_ai/core/ux/error_recovery_view.dart';
 import '../widgets/context_panel.dart';
 import '../widgets/message_card.dart';
 import '../widgets/typing_indicator.dart';
@@ -82,6 +85,13 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
             Expanded(
               child: messagesAsync.when(
                 data: (messages) {
+                  if (messages.isEmpty) {
+                    return const EmptyStateView(
+                      icon: Icons.chat_bubble_outline,
+                      title: 'How can I help?',
+                      description: 'Ask me about your budget, itinerary, or local recommendations.',
+                    );
+                  }
                   return ListView.builder(
                     controller: _scrollController,
                     itemCount: messages.length,
@@ -100,12 +110,34 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
                     },
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator(color: Colors.tealAccent)),
-                error: (err, st) => Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Text('Error: $err', style: const TextStyle(color: Colors.redAccent)),
-                  ),
+                loading: () => ListView.builder(
+                  itemCount: 3,
+                  itemBuilder: (context, index) {
+                    final isUser = index % 2 == 0;
+                    return Align(
+                      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: ShimmerLoader(
+                          child: Container(
+                            height: 60,
+                            width: 200,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                error: (err, st) => ErrorRecoveryView(
+                  title: 'Companion Unavailable',
+                  description: 'Unable to connect to the AI service. Please check your connection.',
+                  onRetry: () {
+                    ref.invalidate(companionControllerProvider);
+                  },
                 ),
               ),
             ),

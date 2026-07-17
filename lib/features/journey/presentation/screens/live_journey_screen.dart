@@ -12,6 +12,7 @@ import 'package:voyanta_ai/features/trip_planner/domain/entities/activity.dart';
 import 'package:voyanta_ai/features/intelligence/presentation/controllers/intelligence_providers.dart';
 import 'package:voyanta_ai/features/intelligence/presentation/widgets/recommendation_card.dart';
 import 'package:voyanta_ai/core/widgets/sync_status_banner.dart';
+import 'package:voyanta_ai/core/ux/voyanta_button.dart';
 
 class LiveJourneyScreen extends ConsumerStatefulWidget {
   const LiveJourneyScreen({super.key});
@@ -215,23 +216,11 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
                   ),
                 ),
 
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.tealAccent,
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                    ),
-                    onPressed: () {
-                      ref.read(journeyControllerProvider.notifier).startJourney(_testItinerary);
-                    },
-                    child: const Text(
-                      'Start Journey',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Outfit'),
-                    ),
-                  ),
+                VoyantaButton(
+                  label: 'Start Journey',
+                  onPressed: () {
+                    ref.read(journeyControllerProvider.notifier).startJourney(_testItinerary);
+                  },
                 ),
               ],
             ),
