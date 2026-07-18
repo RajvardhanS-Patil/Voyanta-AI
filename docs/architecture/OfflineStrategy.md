@@ -23,6 +23,27 @@ The client monitors connectivity states continuously:
 
 ## 2. Synchronization Queue Engine
 
+```mermaid
+sequenceDiagram
+    participant UI as Flutter UI
+    participant DB as Isar (Local)
+    participant Q as SyncQueueDb
+    participant S as Supabase (Remote)
+
+    UI->>DB: Write Data (e.g. Save Expense)
+    UI->>Q: Append Sync Action (JSON Payload)
+    
+    alt Offline Mode
+        Q--xS: Connection Failed
+        DB-->>UI: Instantly Update UI
+    else Online Mode
+        Q->>S: Flush Queue (FIFO)
+        S-->>Q: 200 OK
+        Q->>Q: Delete Synced Item
+        DB-->>UI: Instantly Update UI
+    end
+```
+
 Every write operation (creates, edits, deletes) is processed in two local steps:
 
 ### A. Local DB Persistence

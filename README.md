@@ -1,58 +1,116 @@
 <div align="center">
+  <img src="https://via.placeholder.com/150x150?text=Voyanta+Logo" alt="Voyanta AI Logo" width="150"/>
   <h1>Voyanta AI</h1>
+  
   <p><b>AI-Powered Offline-First Travel Planner & Expense Tracker</b></p>
+  
+  <!-- Animated Typing Banner Placeholder -->
+  <a href="https://voyanta.ai">
+    <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=600&size=20&duration=3000&pause=1000&color=20B2AA&center=true&vCenter=true&width=435&lines=Your+Personal+AI+Travel+Concierge;100%25+Offline-First+Architecture;Real-Time+Journey+Geofencing" alt="Typing SVG" />
+  </a>
   <br/>
   
-  [![Release](https://img.shields.io/badge/Release-v1.0.0--beta-blue.svg)](https://github.com/RajvardhanS-Patil/Voyanta-AI)
+  [![Release](https://img.shields.io/badge/Release-v1.0.0--beta-blue.svg)](https://github.com/RajvardhanS-Patil/Voyanta-AI/releases)
   [![Build Status](https://github.com/RajvardhanS-Patil/Voyanta-AI/actions/workflows/flutter_ci.yml/badge.svg)](https://github.com/RajvardhanS-Patil/Voyanta-AI/actions)
   [![Flutter](https://img.shields.io/badge/Flutter-3.19.0-02569B?logo=flutter)](https://flutter.dev/)
+  [![Dart](https://img.shields.io/badge/Dart-3.3.0-0175C2?logo=dart)](https://dart.dev/)
+  [![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-lightgrey)](#)
   [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+  [![GitHub stars](https://img.shields.io/github/stars/RajvardhanS-Patil/Voyanta-AI.svg?style=social&label=Star)](https://github.com/RajvardhanS-Patil/Voyanta-AI/stargazers)
+  [![GitHub issues](https://img.shields.io/github/issues/RajvardhanS-Patil/Voyanta-AI.svg)](https://github.com/RajvardhanS-Patil/Voyanta-AI/issues)
 </div>
 
 <br/>
 
-**Voyanta AI** is a production-grade travel planning and expense management mobile application designed to work completely offline. It features real-time Mapbox vector layouts, live climate analytics from Open-Meteo, and automated itinerary design via Google Gemini Flash models.
+> **Elevator Pitch**: Planning a trip is exhausting. Travelers rely on five different apps—Maps, Spreadsheets, Notes, TripAdvisor, and AI Chats—to manage a single vacation. Voyanta AI unifies this chaos into one **100% Offline-First** application. It orchestrates Google Gemini to build day-by-day itineraries, tracks your live GPS journey, and logs your expenses in a local database that silently syncs to the cloud the moment you find WiFi.
+
+---
+
+## 🎯 Product Vision
+Our mission is to build the ultimate travel companion that works flawlessly in airplane mode. Whether you are navigating the Tokyo subway without a data plan or tracking cash expenses in a remote market, Voyanta AI guarantees 0ms latency and data durability.
+
+---
+
+## 📸 Screenshots & Demos
+
+*(Demo GIF placeholders)*
+<div align="center">
+  <img src="https://via.placeholder.com/250x500?text=AI+Itinerary+Demo" width="250"/>
+  <img src="https://via.placeholder.com/250x500?text=Live+Journey+Demo" width="250"/>
+  <img src="https://via.placeholder.com/250x500?text=Offline+Sync+Demo" width="250"/>
+</div>
+
+For high-resolution marketing assets, view our [Screenshots Guide](docs/assets/SCREENSHOTS_GUIDE.md).
+
+---
 
 ## 🌟 Key Features
 
-- **AI Itinerary Orchestration**: Generates day-by-day travel plans customized to user interests, pacing preference, and budget levels.
-- **Offline-First Architecture**: Read, create, and update trips and expenses without network connections. A FIFO sync queue automatically pushes updates when connection is restored.
-- **Live Journey Engine**: Real-time GPS tracking and geofenced arrival detection.
-- **Interactive Mapping**: Seamless Mapbox integration displaying custom styled marker clusters, spatial coordinates, and offline vector maps.
-- **Budget Tracking**: Register expenses, calculate average costs, categorise transactions, and analyze budgets with clear visual progress indications.
-- **Smart Intelligence Engines**: Injects real-time local weather forecasts and traffic data into an active recommendation stream to build weather-optimized itinerary suggestions.
+| Feature | Description |
+|---------|-------------|
+| 🧠 **AI Itinerary Orchestration** | Generates day-by-day travel plans customized to your budget, pacing, and weather via Gemini 1.5 Flash. |
+| 📴 **Offline-First Resilience** | Optimistic UI writes directly to a local Isar DB. A FIFO queue syncs to Supabase when reconnected. |
+| 📍 **Live Journey Engine** | Real-time GPS tracking and geofenced arrival detection via Mapbox vector layers. |
+| 💬 **Context-Aware AI Companion** | An AI chat assistant that knows your active itinerary, remaining budget, and local weather. |
+| 📊 **Expense Ledger** | Log spending offline and track budget health via animated progress rings. |
 
-## 🛠 Technology Stack
+---
 
-Voyanta AI is built on a cost-effective, highly scalable tech stack:
+## 📐 Architecture & Technology Stack
 
-- **Client**: **Flutter (Dart)** for cross-platform native iOS & Android applications.
-- **Backend**: **Supabase (PostgreSQL)** for secure relational storage, real-time sync, and Row Level Security.
-- **AI Engine**: **Google Gemini 1.5 Flash API** for structured JSON itinerary generation.
-- **Mapping Service**: **Mapbox SDK** with **OpenStreetMap** data layers.
-- **Local Cache**: **Isar Database** for embedded, responsive NoSQL storage in Dart.
-- **State Management**: **Riverpod** with immutable async notifier patterns.
+Voyanta AI implements a strict **Clean Architecture** pattern combined with **Feature-First Modular** directory layouts. 
 
-## 📐 Architecture Overview
+<details>
+<summary><b>View Technology Stack</b></summary>
+<br>
 
-Voyanta AI implements a strict **Clean Architecture** pattern combined with **Feature-First Modular** directory layouts.
+- **Client**: Flutter (Dart) & Riverpod for State Management.
+- **Backend**: Supabase (PostgreSQL, Auth, RLS).
+- **Local Cache**: Isar Database (NoSQL).
+- **AI Engine**: Google Gemini API.
+- **Mapping**: Mapbox SDK.
+</details>
+
+<details>
+<summary><b>View Folder Structure</b></summary>
+<br>
 
 ```text
 lib/
 ├── core/                         # Shared infrastructure (router, theme, UX, sync queue)
 └── features/                     # Self-contained modules by functional area
-    ├── auth/                     # Authentication & onboarding
-    ├── companion/                # Context-aware AI Chat Companion
-    ├── expenses/                 # Expense ledger and budgets
-    ├── intelligence/             # Travel Recommendation & Weather Engines
-    ├── journey/                  # Live GPS tracking and active trip orchestration
-    ├── maps/                     # Mapbox integrations & offline tiles manager
-    └── trip_planner/             # AI trip planner, itineraries, packing lists
+    ├── auth/                     
+    ├── companion/                
+    ├── expenses/                 
+    ├── intelligence/             
+    ├── journey/                  
+    ├── maps/                     
+    └── trip_planner/             
 ```
+</details>
 
-For a deep dive into the architecture, view our [Architecture Diagrams Guide](docs/ArchitectureDiagrams.md).
+For a deep dive into the engineering, view our [Architecture Documentation](docs/architecture/) and [Engineering Case Study](docs/presentations/CASE_STUDY.md).
 
-## 🚀 Quick Start & Installation
+### Deep Dive Modules
+- **AI Architecture**: [Read More](docs/architecture/AIArchitecture.md)
+- **Offline Sync Engine**: [Read More](docs/architecture/OfflineStrategy.md)
+- **Live Journey Engine**: [Read More](docs/architecture/NavigationFlow.md)
+- **State Management**: [Read More](docs/architecture/StateManagement.md)
+
+---
+
+## 🎨 Design System
+
+Voyanta AI utilizes the proprietary **Stitch Design System**, emphasizing:
+- **Glassmorphism**: Frosted glass panels for contextual floating overlays.
+- **Micro-Animations**: Shimmer loaders and Lottie animations to mask API latency.
+- **Palette**: Dark Mode default with vibrant Teal and Coral accents.
+See the [Brand Guidelines](docs/assets/branding/BRAND_GUIDELINES.md) for specifics.
+
+---
+
+## 🚀 Installation & Setup
 
 ### 1. Clone the Repository
 ```bash
@@ -60,7 +118,7 @@ git clone https://github.com/RajvardhanS-Patil/Voyanta-AI.git
 cd Voyanta-AI
 ```
 
-### 2. Configure Environment Variables
+### 2. Environment Setup
 You must provide API keys to compile the application. Create `.env.dev` and `.env.prod` files in the root directory:
 
 ```bash
@@ -70,49 +128,60 @@ SUPABASE_ANON_KEY=your_local_anon_key
 GEMINI_API_KEY=your_gemini_api_studio_key
 ```
 
-### 3. Run the App
+### 3. Running Development
 ```bash
-# Get Dart packages
 flutter pub get
-
-# Generate local database models (Isar mappings)
 flutter pub run build_runner build --delete-conflicting-outputs
-
-# Boot up the Development Flavor
 flutter run -t lib/main_dev.dart
 ```
 
-### 4. Demo Mode (For Presentations)
-If you are presenting the app and want to immediately seed the local Isar database with a mock Paris Trip, expenses, and AI Chat history:
+### 4. Running Demo Mode
+If you are presenting the app to judges or investors, use Demo Mode to inject a rich mock dataset (Paris Itinerary, AI History, Expenses) instantly into the local database:
 ```bash
 flutter run -t lib/main_demo.dart
 ```
 
-## 🧪 Testing
-
-We enforce strict test coverage thresholds covering UI Widgets, Golden Image diffs, and Integration End-to-End paths.
-
+### 5. Building Release (Production)
 ```bash
-# Static Analysis
+flutter build apk --release -t lib/main_prod.dart
+```
+
+---
+
+## 🧪 Testing & CI/CD
+We enforce strict test coverage via GitHub Actions.
+```bash
 flutter analyze
-
-# Unit & Golden Tests
 flutter test --update-goldens test/golden_test.dart
-flutter test
-
-# End-to-End Integration Tests
 flutter test integration_test/app_test.dart
 ```
 
-## 📚 Documentation
-- [Developer Guide](docs/DeveloperGuide.md)
-- [Architecture & Modules](docs/Architecture.md)
-- [Project Roadmap](docs/Roadmap.md)
-- [Case Study & Engineering Post-Mortem](docs/CASE_STUDY.md)
-- [Screenshots Guide](docs/SCREENSHOTS_GUIDE.md)
+---
+
+## 🗺 Roadmap & Future Scope
+- **Phase 15**: Open Source Documentation Overhaul (Completed).
+- **Phase 16**: Multiplayer Trips using CRDTs for collaborative editing.
+- **Phase 17**: Receipt OCR scanning for automatic expense entry.
+See [Roadmap](docs/architecture/Roadmap.md) for full history.
+
+## ⚠️ Known Limitations
+- The Mapbox engine may cause a ~1-second UI stutter on older Android devices during cold boot.
+- AI itinerary generation can take up to 5 seconds due to strict JSON parsing enforcement.
+
+---
 
 ## 🤝 Contributing
-Please read [Contributing.md](docs/Contributing.md) for details on our code of conduct, and the process for submitting pull requests to us.
+We welcome pull requests! Please read our [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](#) before submitting. 
 
-## 📄 License
+If you find a bug, please use the [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.md).
+For security issues, refer to our [Security Policy](SECURITY.md).
+
+---
+
+## 📜 License & Acknowledgements
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+Special thanks to:
+- [Google AI Studio](https://aistudio.google.com/)
+- [Supabase](https://supabase.com/)
+- [Isar Database](https://isar.dev/)
