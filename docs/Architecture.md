@@ -60,7 +60,11 @@ Use Case ──> Repository Interface (Domain)
 Used for wrapping complex third-party system interactions that do not belong to entities or databases, such as:
 - `AIService` (Gemini model API interface)
 - `MapService` (Mapbox rendering and pathfinding wrappers)
-- `LocationService` (GPS system integrations)
+
+### Engine & Pipeline Pattern (Phase 10 & 11)
+Voyanta AI introduces dedicated "Engines" for high-level orchestration across domains:
+- **Offline Sync Engine**: A FIFO queue processor and Dual-Layer Cache Manager (Isar) utilizing Last-Write-Wins conflict resolution.
+- **Smart Intelligence Engine**: A suite of reactive rules engines (Weather, Budget, Traffic) that independently monitor application state and push recommendations to a unified stream.
 
 ---
 

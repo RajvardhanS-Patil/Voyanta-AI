@@ -33,12 +33,15 @@ The codebase is structured using **Clean Architecture** patterns separated into 
 
 ```
 lib/
-├── core/                         # Shared infrastructural configurations (router, theme, etc.)
+├── core/                         # Shared infrastructural configurations (router, theme, UX components, sync queue)
 └── features/                     # Self-contained modules by functional area
     ├── auth/                     # Authentication & user onboarding
-    ├── trip_planner/             # AI trip planner, itineraries, packing lists
+    ├── companion/                # Context-aware AI Chat Companion
     ├── expenses/                 # Expense ledger and budgets
-    └── maps/                     # Mapbox integrations & offline tiles manager
+    ├── intelligence/             # Travel Recommendation & Weather Engines
+    ├── journey/                  # Live GPS tracking and active trip orchestration
+    ├── maps/                     # Mapbox integrations & offline tiles manager
+    └── trip_planner/             # AI trip planner, itineraries, packing lists
 ```
 
 ---
@@ -58,10 +61,13 @@ lib/
    cd Voyanta-AI
    ```
 
-2. **Boot up Local Databases**
-   ```bash
-   supabase init
-   supabase start
+2. **Environment Variables**
+   Create a `.env` file at the root:
+   ```env
+   MAPBOX_PUBLIC_TOKEN=your_mapbox_public_token
+   SUPABASE_URL=your_supabase_url
+   SUPABASE_ANON_KEY=your_supabase_anon_key
+   GEMINI_API_KEY=your_gemini_api_key
    ```
 
 3. **Install Client Dependencies**
@@ -77,16 +83,20 @@ lib/
 
 ---
 
-## 🗺 Development Roadmap
+## 🗺 Development Roadmap (Completed)
 
-- **Phase 1: Project Foundation (Done)**: Architectural guidelines and codebase specifications.
-- **Phase 2: Authentication & Onboarding**: Supabase Auth client logic and secure storage hooks.
-- **Phase 3: AI Prompts Pipeline**: Gemini Client integration and output schema verification.
-- **Phase 4: Trip Dashboard**: Schedules, days views, and trip lists.
-- **Phase 5: Mapbox Clustering**: Geo-spatial rendering and routes drawing.
-- **Phase 6: Expense Tracking**: Calculators, transaction history, and budget charts.
-- **Phase 7: Offline & Cache Sync**: Local Isar database storage and synchronization manager queue processing.
-- **Phase 8: Visual Polish & Performance**: Micro-interactions, custom animations, and asset packaging.
+Voyanta AI has completed its 12-Phase roadmap and is currently in **Closed Beta**.
+
+- **Phase 1-3:** Foundation, Supabase Auth, and Gemini AI Prompts Pipeline.
+- **Phase 4-6:** Trip Dashboard, Mapbox Clustering, and Expense Tracking.
+- **Phase 7-9:** Offline Isar Sync, Live Journey Tracking, and Proactive AI Companion.
+- **Phase 10-11:** Smart Travel Intelligence and Cross-Module Integration.
+- **Phase 12:** Enterprise Productization, UX Unification (Stitch Design Language), and Release Candidate Polish.
+
+### Future Scope
+- Collaborative trip planning.
+- iOS App Store & Google Play Store public release.
+- Integration with third-party booking APIs.
 
 ---
 

@@ -20,7 +20,7 @@ class DashboardScreen extends StatelessWidget {
         context.go('/');
         break;
       case 1:
-        // context.go('/planner');
+        context.go('/planner');
         break;
       case 2:
         context.go('/companion');

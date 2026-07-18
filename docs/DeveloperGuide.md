@@ -28,6 +28,7 @@ supabase start
 ### Step 3: Configure Environment
 Create a `.env` file or supply variables to build targets:
 ```bash
+MAPBOX_PUBLIC_TOKEN=your_mapbox_public_token
 SUPABASE_URL=http://localhost:54321
 SUPABASE_ANON_KEY=your_local_anon_key
 GEMINI_API_KEY=your_gemini_api_studio_key

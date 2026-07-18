@@ -6,6 +6,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/journey/presentation/screens/live_journey_screen.dart';
 import '../../features/companion/presentation/screens/companion_screen.dart';
 import '../../features/expenses/presentation/screens/expense_dashboard_screen.dart';
+import '../../features/trip_planner/presentation/screens/trip_planner_screen.dart';
 import '../widgets/dashboard_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -43,6 +44,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/expenses',
             builder: (context, state) => const ExpenseDashboardScreen(),
+          ),
+          GoRoute(
+            path: '/planner',
+            builder: (context, state) => const TripPlannerScreen(),
           ),
           // TODO: Add other feature screens
         ],
