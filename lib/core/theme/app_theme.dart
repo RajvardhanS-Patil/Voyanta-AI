@@ -16,7 +16,6 @@ class AppTheme {
         primary: tealAccent,
         secondary: coralAccent,
         surface: surfaceColor,
-        background: deepSlate,
       ),
       useMaterial3: true,
       
