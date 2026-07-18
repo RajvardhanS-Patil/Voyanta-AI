@@ -10,6 +10,7 @@ import 'package:voyanta_ai/features/trip_planner/data/models/trip_itinerary_mode
 import 'package:voyanta_ai/features/journey/domain/entities/journey_state.dart';
 import 'package:voyanta_ai/features/journey/domain/repositories/location_repository.dart';
 import 'package:voyanta_ai/features/journey/domain/usecases/calculate_eta_usecase.dart';
+import 'package:voyanta_ai/core/observability/observability_service.dart';
 import 'journey_providers.dart';
 
 class JourneyController extends Notifier<JourneyState> {
@@ -113,6 +114,11 @@ class JourneyController extends Notifier<JourneyState> {
       status: JourneyStatus.navigating,
       permissionDenied: false,
     );
+
+    ObservabilityService.trackEvent('journey_started', {
+      'dayNumber': itinerary.dayNumber,
+      'totalActivities': itinerary.activities.length,
+    });
 
     final lastKnown = await _locationRepo.getLastKnownPosition();
     if (lastKnown != null) {

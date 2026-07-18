@@ -4,6 +4,7 @@ import 'package:isar/isar.dart';
 import 'package:voyanta_ai/core/database/isar_service.dart';
 import 'package:voyanta_ai/core/database/collections/sync_queue_db.dart';
 import 'package:voyanta_ai/core/services/connectivity_service.dart';
+import 'package:voyanta_ai/core/observability/observability_service.dart';
 
 class SyncQueueProcessor {
   final Ref _ref;
@@ -42,7 +43,14 @@ class SyncQueueProcessor {
           break;
         }
       }
-    } catch (_) {
+      
+      if (queueItems.isNotEmpty) {
+        ObservabilityService.trackEvent('offline_sync_completed', {
+          'synced_items_count': queueItems.length,
+        });
+      }
+    } catch (e, st) {
+      ObservabilityService.logError('Sync Queue failed', e, st);
     } finally {
       _isProcessing = false;
     }

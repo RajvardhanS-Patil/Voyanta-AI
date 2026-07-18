@@ -9,6 +9,7 @@ import 'package:voyanta_ai/features/companion/domain/usecases/get_companion_resp
 import 'package:voyanta_ai/features/expenses/presentation/controllers/expense_controller.dart';
 import 'package:voyanta_ai/features/expenses/presentation/controllers/expense_providers.dart';
 import 'package:voyanta_ai/features/journey/presentation/controllers/journey_controller.dart';
+import 'package:voyanta_ai/core/observability/observability_service.dart';
 import 'companion_providers.dart';
 
 class CompanionController extends AsyncNotifier<List<ChatMessage>> {
@@ -102,6 +103,7 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
       final finalMessages = state.value!.where((msg) => msg.id != 'typing').toList();
       state = AsyncData([...finalMessages, assistantMessage]);
       await _saveMessageToDb(assistantMessage);
+      ObservabilityService.trackEvent('ai_request', {'success': true});
     } catch (e, st) {
       final finalMessages = state.value!.where((msg) => msg.id != 'typing').toList();
       final errorReply = ChatMessage(

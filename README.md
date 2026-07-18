@@ -1,5 +1,8 @@
 # Voyanta AI — AI-Powered Offline-First Travel Planner & Expense Tracker
 
+![Beta Release](https://img.shields.io/badge/Release-v1.0.0--beta-blue.svg)
+![Build Status](https://github.com/RajvardhanS-Patil/Voyanta-AI/actions/workflows/flutter_ci.yml/badge.svg)
+
 Voyanta AI is a production-grade, AI-driven travel planning and expense management mobile application designed to work completely offline, featuring real-time Mapbox vector layouts, live climate analytics from Open-Meteo, and automated itinerary design via Google Gemini Flash models.
 
 ---
@@ -11,6 +14,7 @@ Voyanta AI is a production-grade, AI-driven travel planning and expense manageme
 - **Interactive Mapping**: Seamless Mapbox integration displaying custom styled marker clusters, spatial coordinates, and offline vector maps.
 - **Budget Tracking**: Register expenses, calculate average costs, categorise transactions, and analyze budgets with clear visual progress indications.
 - **Weather Analysis**: Injects real-time local weather forecasts into the AI prompt orchestrator to build weather-optimized itinerary suggestions.
+- **Observability & Analytics**: Structured logging and event tracking to monitor app health and user journeys.
 
 ---
 

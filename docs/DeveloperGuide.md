@@ -26,7 +26,7 @@ supabase start
 *This command outputs the local database URIs, API keys, and studio URLs.*
 
 ### Step 3: Configure Environment
-Create a `.env` file or supply variables to build targets:
+Voyanta AI uses separate environments. Create `.env.dev` and `.env.prod` files:
 ```bash
 MAPBOX_PUBLIC_TOKEN=your_mapbox_public_token
 SUPABASE_URL=http://localhost:54321
@@ -42,8 +42,11 @@ flutter pub get
 # Generate local database models (Isar mappings)
 flutter pub run build_runner build --delete-conflicting-outputs
 
-# Boot up application on targeted emulator
-flutter run
+# Boot up the Development Flavor
+flutter run -t lib/main_dev.dart
+
+# Boot up the Production Flavor
+flutter run -t lib/main_prod.dart
 ```
 
 ---

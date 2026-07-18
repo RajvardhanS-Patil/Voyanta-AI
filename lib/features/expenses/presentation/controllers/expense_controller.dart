@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voyanta_ai/features/expenses/domain/entities/expense.dart';
 import 'package:voyanta_ai/features/expenses/domain/repositories/expense_repository.dart';
+import 'package:voyanta_ai/core/observability/observability_service.dart';
 import 'expense_providers.dart';
 
 class ExpenseController extends AsyncNotifier<List<Expense>> {
@@ -21,6 +22,10 @@ class ExpenseController extends AsyncNotifier<List<Expense>> {
     
     try {
       await _repository.addExpense(expense);
+      ObservabilityService.trackEvent('expense_added', {
+        'amount': expense.amount,
+        'category': expense.category,
+      });
     } catch (e, st) {
       // Revert if DB fails
       state = previousState;
