@@ -17,7 +17,10 @@ class ConnectivityService extends Notifier<ConnectionStatus> {
   }
 
   void _startPingTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 12), (_) => checkConnection());
+    _timer = Timer.periodic(
+      const Duration(seconds: 12),
+      (_) => checkConnection(),
+    );
     checkConnection();
   }
 
@@ -25,10 +28,11 @@ class ConnectivityService extends Notifier<ConnectionStatus> {
     try {
       final stopwatch = Stopwatch()..start();
       // Verify genuine internet backhaul with ping timeout
-      final result = await InternetAddress.lookup('google.com')
-          .timeout(const Duration(seconds: 4));
+      final result = await InternetAddress.lookup(
+        'google.com',
+      ).timeout(const Duration(seconds: 4));
       stopwatch.stop();
-      
+
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         if (stopwatch.elapsedMilliseconds > 1800) {
           state = ConnectionStatus.weak;

@@ -13,10 +13,11 @@ class SafetyIntelligenceEngine {
         type: RecommendationType.safety,
         severity: AlertSeverity.info,
         title: 'Emergency Safety Guidelines',
-        description: 'New York City local hotlines: Dial 911 for emergency support. Dial 311 for local assistance.',
+        description:
+            'New York City local hotlines: Dial 911 for emergency support. Dial 311 for local assistance.',
       ),
     );
-    
+
     return recommendations;
   }
 }

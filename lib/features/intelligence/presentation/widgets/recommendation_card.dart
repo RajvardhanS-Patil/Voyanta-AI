@@ -55,7 +55,9 @@ class RecommendationCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B).withValues(alpha: 0.5), // Slate obsidian glass
+              color: const Color(
+                0xFF1E293B,
+              ).withValues(alpha: 0.5), // Slate obsidian glass
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: accentColor.withValues(alpha: 0.25)),
               boxShadow: [

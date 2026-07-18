@@ -8,7 +8,7 @@ class UserProfileDb {
 
   @Index(unique: true, replace: true)
   late String uid;
-  
+
   late String email;
   late String name;
 }

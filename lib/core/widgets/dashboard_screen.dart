@@ -39,7 +39,9 @@ class DashboardScreen extends StatelessWidget {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: const Color(0xFF0F172A),
-          border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+          border: Border(
+            top: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          ),
         ),
         child: BottomNavigationBar(
           backgroundColor: Colors.transparent,

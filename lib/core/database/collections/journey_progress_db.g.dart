@@ -42,16 +42,8 @@ const JourneyProgressDbSchema = CollectionSchema(
       name: r'lastUpdated',
       type: IsarType.dateTime,
     ),
-    r'status': PropertySchema(
-      id: 5,
-      name: r'status',
-      type: IsarType.string,
-    ),
-    r'tripId': PropertySchema(
-      id: 6,
-      name: r'tripId',
-      type: IsarType.string,
-    )
+    r'status': PropertySchema(id: 5, name: r'status', type: IsarType.string),
+    r'tripId': PropertySchema(id: 6, name: r'tripId', type: IsarType.string),
   },
   estimateSize: _journeyProgressDbEstimateSize,
   serialize: _journeyProgressDbSerialize,
@@ -69,9 +61,9 @@ const JourneyProgressDbSchema = CollectionSchema(
           name: r'tripId',
           type: IndexType.hash,
           caseSensitive: true,
-        )
+        ),
       ],
-    )
+    ),
   },
   links: {},
   embeddedSchemas: {},
@@ -162,12 +154,16 @@ Id _journeyProgressDbGetId(JourneyProgressDb object) {
 }
 
 List<IsarLinkBase<dynamic>> _journeyProgressDbGetLinks(
-    JourneyProgressDb object) {
+  JourneyProgressDb object,
+) {
   return [];
 }
 
 void _journeyProgressDbAttach(
-    IsarCollection<dynamic> col, Id id, JourneyProgressDb object) {
+  IsarCollection<dynamic> col,
+  Id id,
+  JourneyProgressDb object,
+) {
   object.id = id;
 }
 
@@ -220,8 +216,10 @@ extension JourneyProgressDbByIndex on IsarCollection<JourneyProgressDb> {
     return putAllByIndex(r'tripId', objects);
   }
 
-  List<Id> putAllByTripIdSync(List<JourneyProgressDb> objects,
-      {bool saveLinks = true}) {
+  List<Id> putAllByTripIdSync(
+    List<JourneyProgressDb> objects, {
+    bool saveLinks = true,
+  }) {
     return putAllByIndexSync(r'tripId', objects, saveLinks: saveLinks);
   }
 }
@@ -238,17 +236,14 @@ extension JourneyProgressDbQueryWhereSort
 extension JourneyProgressDbQueryWhere
     on QueryBuilder<JourneyProgressDb, JourneyProgressDb, QWhereClause> {
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterWhereClause>
-      idEqualTo(Id id) {
+  idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IdWhereClause.between(
-        lower: id,
-        upper: id,
-      ));
+      return query.addWhereClause(IdWhereClause.between(lower: id, upper: id));
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterWhereClause>
-      idNotEqualTo(Id id) {
+  idNotEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -271,7 +266,7 @@ extension JourneyProgressDbQueryWhere
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterWhereClause>
-      idGreaterThan(Id id, {bool include = false}) {
+  idGreaterThan(Id id, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.greaterThan(lower: id, includeLower: include),
@@ -280,7 +275,7 @@ extension JourneyProgressDbQueryWhere
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterWhereClause>
-      idLessThan(Id id, {bool include = false}) {
+  idLessThan(Id id, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.lessThan(upper: id, includeUpper: include),
@@ -289,63 +284,72 @@ extension JourneyProgressDbQueryWhere
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterWhereClause>
-      idBetween(
+  idBetween(
     Id lowerId,
     Id upperId, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IdWhereClause.between(
-        lower: lowerId,
-        includeLower: includeLower,
-        upper: upperId,
-        includeUpper: includeUpper,
-      ));
+      return query.addWhereClause(
+        IdWhereClause.between(
+          lower: lowerId,
+          includeLower: includeLower,
+          upper: upperId,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterWhereClause>
-      tripIdEqualTo(String tripId) {
+  tripIdEqualTo(String tripId) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'tripId',
-        value: [tripId],
-      ));
+      return query.addWhereClause(
+        IndexWhereClause.equalTo(indexName: r'tripId', value: [tripId]),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterWhereClause>
-      tripIdNotEqualTo(String tripId) {
+  tripIdNotEqualTo(String tripId) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'tripId',
-              lower: [],
-              upper: [tripId],
-              includeUpper: false,
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'tripId',
-              lower: [tripId],
-              includeLower: false,
-              upper: [],
-            ));
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'tripId',
+                lower: [],
+                upper: [tripId],
+                includeUpper: false,
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'tripId',
+                lower: [tripId],
+                includeLower: false,
+                upper: [],
+              ),
+            );
       } else {
         return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'tripId',
-              lower: [tripId],
-              includeLower: false,
-              upper: [],
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'tripId',
-              lower: [],
-              upper: [tripId],
-              includeUpper: false,
-            ));
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'tripId',
+                lower: [tripId],
+                includeLower: false,
+                upper: [],
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'tripId',
+                lower: [],
+                upper: [tripId],
+                includeUpper: false,
+              ),
+            );
       }
     });
   }
@@ -354,71 +358,74 @@ extension JourneyProgressDbQueryWhere
 extension JourneyProgressDbQueryFilter
     on QueryBuilder<JourneyProgressDb, JourneyProgressDb, QFilterCondition> {
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonIsNull() {
+  activeItineraryJsonIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'activeItineraryJson',
-      ));
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'activeItineraryJson'),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonIsNotNull() {
+  activeItineraryJsonIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'activeItineraryJson',
-      ));
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'activeItineraryJson'),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonEqualTo(
-    String? value, {
-    bool caseSensitive = true,
-  }) {
+  activeItineraryJsonEqualTo(String? value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'activeItineraryJson',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'activeItineraryJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonGreaterThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'activeItineraryJson',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonLessThan(
+  activeItineraryJsonGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'activeItineraryJson',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'activeItineraryJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonBetween(
+  activeItineraryJsonLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'activeItineraryJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
+  activeItineraryJsonBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -426,191 +433,201 @@ extension JourneyProgressDbQueryFilter
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'activeItineraryJson',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'activeItineraryJson',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  activeItineraryJsonStartsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'activeItineraryJson',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'activeItineraryJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  activeItineraryJsonEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'activeItineraryJson',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'activeItineraryJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonContains(String value, {bool caseSensitive = true}) {
+  activeItineraryJsonContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'activeItineraryJson',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'activeItineraryJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonMatches(String pattern, {bool caseSensitive = true}) {
+  activeItineraryJsonMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'activeItineraryJson',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'activeItineraryJson',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonIsEmpty() {
+  activeItineraryJsonIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'activeItineraryJson',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'activeItineraryJson', value: ''),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      activeItineraryJsonIsNotEmpty() {
+  activeItineraryJsonIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'activeItineraryJson',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          property: r'activeItineraryJson',
+          value: '',
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentActivityIndexEqualTo(int value) {
+  currentActivityIndexEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'currentActivityIndex',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'currentActivityIndex',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentActivityIndexGreaterThan(
-    int value, {
-    bool include = false,
-  }) {
+  currentActivityIndexGreaterThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'currentActivityIndex',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'currentActivityIndex',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentActivityIndexLessThan(
-    int value, {
-    bool include = false,
-  }) {
+  currentActivityIndexLessThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'currentActivityIndex',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'currentActivityIndex',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentActivityIndexBetween(
+  currentActivityIndexBetween(
     int lower,
     int upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'currentActivityIndex',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'currentActivityIndex',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentLatitudeEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
-  }) {
+  currentLatitudeEqualTo(double value, {double epsilon = Query.epsilon}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'currentLatitude',
-        value: value,
-        epsilon: epsilon,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'currentLatitude',
+          value: value,
+          epsilon: epsilon,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentLatitudeGreaterThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'currentLatitude',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentLatitudeLessThan(
+  currentLatitudeGreaterThan(
     double value, {
     bool include = false,
     double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'currentLatitude',
-        value: value,
-        epsilon: epsilon,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'currentLatitude',
+          value: value,
+          epsilon: epsilon,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentLatitudeBetween(
+  currentLatitudeLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'currentLatitude',
+          value: value,
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
+  currentLatitudeBetween(
     double lower,
     double upper, {
     bool includeLower = true,
@@ -618,65 +635,70 @@ extension JourneyProgressDbQueryFilter
     double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'currentLatitude',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'currentLatitude',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          epsilon: epsilon,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentLongitudeEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
-  }) {
+  currentLongitudeEqualTo(double value, {double epsilon = Query.epsilon}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'currentLongitude',
-        value: value,
-        epsilon: epsilon,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'currentLongitude',
+          value: value,
+          epsilon: epsilon,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentLongitudeGreaterThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'currentLongitude',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentLongitudeLessThan(
+  currentLongitudeGreaterThan(
     double value, {
     bool include = false,
     double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'currentLongitude',
-        value: value,
-        epsilon: epsilon,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'currentLongitude',
+          value: value,
+          epsilon: epsilon,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      currentLongitudeBetween(
+  currentLongitudeLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'currentLongitude',
+          value: value,
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
+  currentLongitudeBetween(
     double lower,
     double upper, {
     bool includeLower = true,
@@ -684,177 +706,180 @@ extension JourneyProgressDbQueryFilter
     double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'currentLongitude',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'currentLongitude',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          epsilon: epsilon,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      idEqualTo(Id value) {
+  idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'id',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'id', value: value),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      idGreaterThan(
-    Id value, {
-    bool include = false,
-  }) {
+  idGreaterThan(Id value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'id',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'id',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      idLessThan(
-    Id value, {
-    bool include = false,
-  }) {
+  idLessThan(Id value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'id',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'id',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      idBetween(
+  idBetween(
     Id lower,
     Id upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'id',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'id',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      lastUpdatedEqualTo(DateTime value) {
+  lastUpdatedEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'lastUpdated',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'lastUpdated', value: value),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      lastUpdatedGreaterThan(
-    DateTime value, {
-    bool include = false,
-  }) {
+  lastUpdatedGreaterThan(DateTime value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'lastUpdated',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'lastUpdated',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      lastUpdatedLessThan(
-    DateTime value, {
-    bool include = false,
-  }) {
+  lastUpdatedLessThan(DateTime value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'lastUpdated',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'lastUpdated',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      lastUpdatedBetween(
+  lastUpdatedBetween(
     DateTime lower,
     DateTime upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'lastUpdated',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'lastUpdated',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      statusEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  statusEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'status',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'status',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      statusGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'status',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      statusLessThan(
+  statusGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'status',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'status',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      statusBetween(
+  statusLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'status',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
+  statusBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -862,135 +887,140 @@ extension JourneyProgressDbQueryFilter
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'status',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'status',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      statusStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  statusStartsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'status',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'status',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      statusEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  statusEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'status',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'status',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      statusContains(String value, {bool caseSensitive = true}) {
+  statusContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'status',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'status',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      statusMatches(String pattern, {bool caseSensitive = true}) {
+  statusMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'status',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'status',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      statusIsEmpty() {
+  statusIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'status',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'status', value: ''),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      statusIsNotEmpty() {
+  statusIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'status',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'status', value: ''),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      tripIdEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  tripIdEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'tripId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'tripId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      tripIdGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'tripId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      tripIdLessThan(
+  tripIdGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'tripId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'tripId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      tripIdBetween(
+  tripIdLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'tripId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
+  tripIdBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -998,84 +1028,86 @@ extension JourneyProgressDbQueryFilter
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'tripId',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'tripId',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      tripIdStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  tripIdStartsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'tripId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'tripId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      tripIdEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  tripIdEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'tripId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'tripId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      tripIdContains(String value, {bool caseSensitive = true}) {
+  tripIdContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'tripId',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'tripId',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      tripIdMatches(String pattern, {bool caseSensitive = true}) {
+  tripIdMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'tripId',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'tripId',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      tripIdIsEmpty() {
+  tripIdIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'tripId',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'tripId', value: ''),
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterFilterCondition>
-      tripIdIsNotEmpty() {
+  tripIdIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'tripId',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'tripId', value: ''),
+      );
     });
   }
 }
@@ -1089,98 +1121,98 @@ extension JourneyProgressDbQueryLinks
 extension JourneyProgressDbQuerySortBy
     on QueryBuilder<JourneyProgressDb, JourneyProgressDb, QSortBy> {
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByActiveItineraryJson() {
+  sortByActiveItineraryJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'activeItineraryJson', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByActiveItineraryJsonDesc() {
+  sortByActiveItineraryJsonDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'activeItineraryJson', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByCurrentActivityIndex() {
+  sortByCurrentActivityIndex() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentActivityIndex', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByCurrentActivityIndexDesc() {
+  sortByCurrentActivityIndexDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentActivityIndex', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByCurrentLatitude() {
+  sortByCurrentLatitude() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentLatitude', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByCurrentLatitudeDesc() {
+  sortByCurrentLatitudeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentLatitude', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByCurrentLongitude() {
+  sortByCurrentLongitude() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentLongitude', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByCurrentLongitudeDesc() {
+  sortByCurrentLongitudeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentLongitude', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByLastUpdated() {
+  sortByLastUpdated() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdated', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByLastUpdatedDesc() {
+  sortByLastUpdatedDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdated', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByStatus() {
+  sortByStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByStatusDesc() {
+  sortByStatusDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByTripId() {
+  sortByTripId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tripId', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      sortByTripIdDesc() {
+  sortByTripIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tripId', Sort.desc);
     });
@@ -1190,56 +1222,56 @@ extension JourneyProgressDbQuerySortBy
 extension JourneyProgressDbQuerySortThenBy
     on QueryBuilder<JourneyProgressDb, JourneyProgressDb, QSortThenBy> {
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByActiveItineraryJson() {
+  thenByActiveItineraryJson() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'activeItineraryJson', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByActiveItineraryJsonDesc() {
+  thenByActiveItineraryJsonDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'activeItineraryJson', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByCurrentActivityIndex() {
+  thenByCurrentActivityIndex() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentActivityIndex', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByCurrentActivityIndexDesc() {
+  thenByCurrentActivityIndexDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentActivityIndex', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByCurrentLatitude() {
+  thenByCurrentLatitude() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentLatitude', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByCurrentLatitudeDesc() {
+  thenByCurrentLatitudeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentLatitude', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByCurrentLongitude() {
+  thenByCurrentLongitude() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentLongitude', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByCurrentLongitudeDesc() {
+  thenByCurrentLongitudeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'currentLongitude', Sort.desc);
     });
@@ -1252,49 +1284,49 @@ extension JourneyProgressDbQuerySortThenBy
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByIdDesc() {
+  thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByLastUpdated() {
+  thenByLastUpdated() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdated', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByLastUpdatedDesc() {
+  thenByLastUpdatedDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastUpdated', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByStatus() {
+  thenByStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByStatusDesc() {
+  thenByStatusDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.desc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByTripId() {
+  thenByTripId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tripId', Sort.asc);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QAfterSortBy>
-      thenByTripIdDesc() {
+  thenByTripIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'tripId', Sort.desc);
     });
@@ -1304,50 +1336,52 @@ extension JourneyProgressDbQuerySortThenBy
 extension JourneyProgressDbQueryWhereDistinct
     on QueryBuilder<JourneyProgressDb, JourneyProgressDb, QDistinct> {
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QDistinct>
-      distinctByActiveItineraryJson({bool caseSensitive = true}) {
+  distinctByActiveItineraryJson({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'activeItineraryJson',
-          caseSensitive: caseSensitive);
+      return query.addDistinctBy(
+        r'activeItineraryJson',
+        caseSensitive: caseSensitive,
+      );
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QDistinct>
-      distinctByCurrentActivityIndex() {
+  distinctByCurrentActivityIndex() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'currentActivityIndex');
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QDistinct>
-      distinctByCurrentLatitude() {
+  distinctByCurrentLatitude() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'currentLatitude');
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QDistinct>
-      distinctByCurrentLongitude() {
+  distinctByCurrentLongitude() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'currentLongitude');
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QDistinct>
-      distinctByLastUpdated() {
+  distinctByLastUpdated() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'lastUpdated');
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QDistinct>
-      distinctByStatus({bool caseSensitive = true}) {
+  distinctByStatus({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'status', caseSensitive: caseSensitive);
     });
   }
 
   QueryBuilder<JourneyProgressDb, JourneyProgressDb, QDistinct>
-      distinctByTripId({bool caseSensitive = true}) {
+  distinctByTripId({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'tripId', caseSensitive: caseSensitive);
     });
@@ -1363,35 +1397,35 @@ extension JourneyProgressDbQueryProperty
   }
 
   QueryBuilder<JourneyProgressDb, String?, QQueryOperations>
-      activeItineraryJsonProperty() {
+  activeItineraryJsonProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'activeItineraryJson');
     });
   }
 
   QueryBuilder<JourneyProgressDb, int, QQueryOperations>
-      currentActivityIndexProperty() {
+  currentActivityIndexProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'currentActivityIndex');
     });
   }
 
   QueryBuilder<JourneyProgressDb, double, QQueryOperations>
-      currentLatitudeProperty() {
+  currentLatitudeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'currentLatitude');
     });
   }
 
   QueryBuilder<JourneyProgressDb, double, QQueryOperations>
-      currentLongitudeProperty() {
+  currentLongitudeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'currentLongitude');
     });
   }
 
   QueryBuilder<JourneyProgressDb, DateTime, QQueryOperations>
-      lastUpdatedProperty() {
+  lastUpdatedProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'lastUpdated');
     });

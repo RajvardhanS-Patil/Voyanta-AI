@@ -14,7 +14,8 @@ class FoodIntelligenceEngine {
           type: RecommendationType.food,
           severity: AlertSeverity.info,
           title: 'Nearby Dining: Central Park',
-          description: 'Try "Tavern on the Green" for iconic park dining, or visit "The Loeb Boathouse" deck.',
+          description:
+              'Try "Tavern on the Green" for iconic park dining, or visit "The Loeb Boathouse" deck.',
         ),
       );
     } else if (target.contains('Empire State')) {
@@ -24,11 +25,12 @@ class FoodIntelligenceEngine {
           type: RecommendationType.food,
           severity: AlertSeverity.info,
           title: 'Nearby Dining: Empire State',
-          description: 'Head to "Koreatown" on 32nd St for authentic barbecue spots just 2 blocks south.',
+          description:
+              'Head to "Koreatown" on 32nd St for authentic barbecue spots just 2 blocks south.',
         ),
       );
     }
-    
+
     return recommendations;
   }
 }

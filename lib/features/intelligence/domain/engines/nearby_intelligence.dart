@@ -14,7 +14,8 @@ class NearbyIntelligenceEngine {
           type: RecommendationType.nearby,
           severity: AlertSeverity.info,
           title: 'Photo Spot: Flatiron Building',
-          description: 'The historic architectural gem is just a 12-minute walk south down 5th Ave.',
+          description:
+              'The historic architectural gem is just a 12-minute walk south down 5th Ave.',
           actionLabel: 'Route There',
         ),
       );
@@ -25,11 +26,12 @@ class NearbyIntelligenceEngine {
           type: RecommendationType.nearby,
           severity: AlertSeverity.info,
           title: 'Hidden Gem: Bethesda Fountain',
-          description: ' Bethesda Fountain and Terrace are only 250 meters ahead. Perfect scenic stop.',
+          description:
+              ' Bethesda Fountain and Terrace are only 250 meters ahead. Perfect scenic stop.',
         ),
       );
     }
-    
+
     return recommendations;
   }
 }

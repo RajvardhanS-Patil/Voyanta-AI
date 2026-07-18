@@ -13,13 +13,18 @@ class TripPlannerScreen extends StatelessWidget {
         elevation: 0,
         title: const Text(
           'Trip Planner',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Outfit'),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Outfit',
+          ),
         ),
       ),
       body: const EmptyStateView(
         icon: Icons.map_outlined,
         title: 'Plan Your Next Adventure',
-        description: 'AI-powered trip generation is coming in the next update. Stay tuned!',
+        description:
+            'AI-powered trip generation is coming in the next update. Stay tuned!',
       ),
     );
   }

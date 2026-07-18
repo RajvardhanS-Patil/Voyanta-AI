@@ -29,7 +29,11 @@ class ObservabilityService {
     _logger.w(message);
   }
 
-  static void logError(String message, [dynamic error, StackTrace? stackTrace]) {
+  static void logError(
+    String message, [
+    dynamic error,
+    StackTrace? stackTrace,
+  ]) {
     _logger.e(message, error: error, stackTrace: stackTrace);
     // In a real prod environment, this would be sent to Crashlytics or Sentry.
     if (_environment == Environment.prod) {

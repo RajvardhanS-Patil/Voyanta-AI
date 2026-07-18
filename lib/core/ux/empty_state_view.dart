@@ -41,9 +41,7 @@ class EmptyStateView extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -51,9 +49,8 @@ class EmptyStateView extends StatelessWidget {
             Text(
               description,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Colors.white60,
-                fontSize: 16,
                 height: 1.5,
               ),
             ),
@@ -64,14 +61,20 @@ class EmptyStateView extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.tealAccent,
                   foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 16,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 child: Text(
                   primaryActionLabel!,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],
@@ -79,12 +82,10 @@ class EmptyStateView extends StatelessWidget {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: onSecondaryAction,
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.tealAccent,
-                ),
+                style: TextButton.styleFrom(foregroundColor: Colors.tealAccent),
                 child: Text(secondaryActionLabel!),
               ),
-            ]
+            ],
           ],
         ),
       ),

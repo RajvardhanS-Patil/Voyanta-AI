@@ -19,7 +19,7 @@ class ExpenseController extends AsyncNotifier<List<Expense>> {
     if (state.hasValue) {
       state = AsyncData([expense, ...state.value!]);
     }
-    
+
     try {
       await _repository.addExpense(expense);
       ObservabilityService.trackEvent('expense_added', {
@@ -48,6 +48,7 @@ class ExpenseController extends AsyncNotifier<List<Expense>> {
   }
 }
 
-final expenseControllerProvider = AsyncNotifierProvider<ExpenseController, List<Expense>>(() {
-  return ExpenseController();
-});
+final expenseControllerProvider =
+    AsyncNotifierProvider<ExpenseController, List<Expense>>(() {
+      return ExpenseController();
+    });

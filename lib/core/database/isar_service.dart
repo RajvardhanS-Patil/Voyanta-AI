@@ -14,18 +14,15 @@ class IsarService {
 
   static Future<void> initialize() async {
     final dir = await getApplicationDocumentsDirectory();
-    isar = await Isar.open(
-      [
-        UserProfileDbSchema,
-        TripDbSchema,
-        ExpenseDbSchema,
-        JourneyProgressDbSchema,
-        ChatMessageDbSchema,
-        RecommendationDbSchema,
-        CacheEntryDbSchema,
-        SyncQueueDbSchema,
-      ],
-      directory: dir.path,
-    );
+    isar = await Isar.open([
+      UserProfileDbSchema,
+      TripDbSchema,
+      ExpenseDbSchema,
+      JourneyProgressDbSchema,
+      ChatMessageDbSchema,
+      RecommendationDbSchema,
+      CacheEntryDbSchema,
+      SyncQueueDbSchema,
+    ], directory: dir.path);
   }
 }

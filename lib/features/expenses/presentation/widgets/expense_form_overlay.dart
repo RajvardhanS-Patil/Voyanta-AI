@@ -32,7 +32,9 @@ class _ExpenseFormOverlayState extends ConsumerState<ExpenseFormOverlay> {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       amount: amount,
       category: _category,
-      description: _descController.text.isNotEmpty ? _descController.text : 'New Expense',
+      description: _descController.text.isNotEmpty
+          ? _descController.text
+          : 'New Expense',
       date: DateTime.now(),
     );
 
@@ -44,7 +46,9 @@ class _ExpenseFormOverlayState extends ConsumerState<ExpenseFormOverlay> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(
-        top: 24, left: 24, right: 24, 
+        top: 24,
+        left: 24,
+        right: 24,
         bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       decoration: BoxDecoration(
@@ -55,7 +59,14 @@ class _ExpenseFormOverlayState extends ConsumerState<ExpenseFormOverlay> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('Log Expense', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+          const Text(
+            'Log Expense',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 20),
           TextField(
             controller: _amountController,
@@ -64,8 +75,12 @@ class _ExpenseFormOverlayState extends ConsumerState<ExpenseFormOverlay> {
             decoration: const InputDecoration(
               labelText: 'Amount (\$)',
               labelStyle: TextStyle(color: Colors.white54),
-              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
-              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.tealAccent)),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white24),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.tealAccent),
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -75,8 +90,12 @@ class _ExpenseFormOverlayState extends ConsumerState<ExpenseFormOverlay> {
             decoration: const InputDecoration(
               labelText: 'Description',
               labelStyle: TextStyle(color: Colors.white54),
-              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
-              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.tealAccent)),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white24),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.tealAccent),
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -94,7 +113,9 @@ class _ExpenseFormOverlayState extends ConsumerState<ExpenseFormOverlay> {
               if (val != null) setState(() => _category = val);
             },
             decoration: const InputDecoration(
-              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.white24),
+              ),
             ),
           ),
           const SizedBox(height: 32),
@@ -104,12 +125,17 @@ class _ExpenseFormOverlayState extends ConsumerState<ExpenseFormOverlay> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.teal,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
               onPressed: _submit,
-              child: const Text('Add Expense', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Add Expense',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
-          )
+          ),
         ],
       ),
     );

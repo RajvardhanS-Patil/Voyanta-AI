@@ -11,11 +11,8 @@ class CalculateBudgetHealthUseCase {
     for (var expense in expenses) {
       totalSpent += expense.amount;
     }
-    
-    return BudgetStatus(
-      totalBudget: totalBudget,
-      currentSpent: totalSpent,
-    );
+
+    return BudgetStatus(totalBudget: totalBudget, currentSpent: totalSpent);
   }
 
   Map<ExpenseCategory, double> getCategoryBreakdown(List<Expense> expenses) {
@@ -23,11 +20,12 @@ class CalculateBudgetHealthUseCase {
     for (var cat in ExpenseCategory.values) {
       breakdown[cat] = 0.0;
     }
-    
+
     for (var expense in expenses) {
-      breakdown[expense.category] = (breakdown[expense.category] ?? 0.0) + expense.amount;
+      breakdown[expense.category] =
+          (breakdown[expense.category] ?? 0.0) + expense.amount;
     }
-    
+
     return breakdown;
   }
 }

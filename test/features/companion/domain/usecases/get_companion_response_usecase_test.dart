@@ -7,7 +7,7 @@ import 'package:voyanta_ai/features/companion/domain/usecases/get_companion_resp
 class MockCompanionRepository implements CompanionRepository {
   List<ChatMessage>? lastHistoryPassed;
   CompanionContext? lastContextPassed;
-  
+
   @override
   Future<ChatMessage> getCompanionResponse({
     required List<ChatMessage> history,
@@ -34,36 +34,39 @@ void main() {
       useCase = GetCompanionResponseUseCase(mockRepository);
     });
 
-    test('should pass history and context to repository and return response message', () async {
-      final context = const CompanionContext(
-        activeTripDestination: 'Tokyo',
-        activeTripTheme: 'Art & Tech',
-        activeTripDayNumber: 2,
-        completedActivityTitles: ['Shibuya Crossing'],
-        nextActivityTitle: 'teamLab Borderless',
-        nextActivityDistanceKm: 3.5,
-        nextActivityEtaMinutes: 20,
-        totalBudget: 3000.0,
-        totalSpent: 450.0,
-        weatherInfo: 'Rainy, 18C',
-      );
+    test(
+      'should pass history and context to repository and return response message',
+      () async {
+        final context = const CompanionContext(
+          activeTripDestination: 'Tokyo',
+          activeTripTheme: 'Art & Tech',
+          activeTripDayNumber: 2,
+          completedActivityTitles: ['Shibuya Crossing'],
+          nextActivityTitle: 'teamLab Borderless',
+          nextActivityDistanceKm: 3.5,
+          nextActivityEtaMinutes: 20,
+          totalBudget: 3000.0,
+          totalSpent: 450.0,
+          weatherInfo: 'Rainy, 18C',
+        );
 
-      final history = [
-        ChatMessage(
-          id: '1',
-          text: 'Suggest food in Tokyo',
-          sender: MessageSender.user,
-          timestamp: DateTime.now(),
-        ),
-      ];
+        final history = [
+          ChatMessage(
+            id: '1',
+            text: 'Suggest food in Tokyo',
+            sender: MessageSender.user,
+            timestamp: DateTime.now(),
+          ),
+        ];
 
-      final result = await useCase(history: history, context: context);
+        final result = await useCase(history: history, context: context);
 
-      expect(result.id, 'mock_id');
-      expect(result.text, 'Mock response for Tokyo');
-      expect(result.sender, MessageSender.assistant);
-      expect(mockRepository.lastHistoryPassed, history);
-      expect(mockRepository.lastContextPassed, context);
-    });
+        expect(result.id, 'mock_id');
+        expect(result.text, 'Mock response for Tokyo');
+        expect(result.sender, MessageSender.assistant);
+        expect(mockRepository.lastHistoryPassed, history);
+        expect(mockRepository.lastContextPassed, context);
+      },
+    );
   });
 }

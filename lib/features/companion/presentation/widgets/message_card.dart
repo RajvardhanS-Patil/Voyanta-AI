@@ -15,7 +15,9 @@ class MessageCard extends StatelessWidget {
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.78),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.78,
+        ),
         child: ClipRRect(
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(20),
@@ -29,8 +31,12 @@ class MessageCard extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: isUser
-                    ? const Color(0xFF5A3EAB).withValues(alpha: 0.25) // Subtle Deep Lavender tint
-                    : const Color(0xFF1E293B).withValues(alpha: 0.45), // Slate Obsidian Glass
+                    ? const Color(0xFF5A3EAB).withValues(
+                        alpha: 0.25,
+                      ) // Subtle Deep Lavender tint
+                    : const Color(
+                        0xFF1E293B,
+                      ).withValues(alpha: 0.45), // Slate Obsidian Glass
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(20),
                   topRight: const Radius.circular(20),

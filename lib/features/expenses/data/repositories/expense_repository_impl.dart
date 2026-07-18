@@ -9,7 +9,10 @@ import '../../domain/repositories/expense_repository.dart';
 class ExpenseRepositoryImpl implements ExpenseRepository {
   @override
   Future<List<Expense>> getExpenses() async {
-    final list = await IsarService.isar.expenseDbs.where().sortByDateDesc().findAll();
+    final list = await IsarService.isar.expenseDbs
+        .where()
+        .sortByDateDesc()
+        .findAll();
     return list.map((db) {
       return Expense(
         id: db.expenseId,
@@ -59,7 +62,10 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
 
   @override
   Future<void> deleteExpense(String id) async {
-    final entry = await IsarService.isar.expenseDbs.filter().expenseIdEqualTo(id).findFirst();
+    final entry = await IsarService.isar.expenseDbs
+        .filter()
+        .expenseIdEqualTo(id)
+        .findFirst();
     if (entry != null) {
       await IsarService.isar.writeTxn(() async {
         await IsarService.isar.expenseDbs.delete(entry.id);
@@ -70,9 +76,7 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
     final queueItem = SyncQueueDb()
       ..operationId = DateTime.now().millisecondsSinceEpoch.toString()
       ..type = 'delete_expense'
-      ..payloadJson = jsonEncode({
-        'expenseId': id,
-      })
+      ..payloadJson = jsonEncode({'expenseId': id})
       ..timestamp = DateTime.now();
 
     await IsarService.isar.writeTxn(() async {

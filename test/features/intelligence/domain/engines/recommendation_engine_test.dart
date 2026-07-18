@@ -28,7 +28,13 @@ void main() {
       dayNumber: 1,
       theme: 'Theme',
       activities: [
-        Activity(time: '10:00 AM', title: 'Central Park', description: 'Desc', latitude: 40.7, longitude: -74.0),
+        Activity(
+          time: '10:00 AM',
+          title: 'Central Park',
+          description: 'Desc',
+          latitude: 40.7,
+          longitude: -74.0,
+        ),
       ],
     );
 
@@ -52,57 +58,75 @@ void main() {
       );
     });
 
-    test('WeatherIntelligence should suggest indoor swap if rain is forecasted', () {
-      const journey = JourneyState(
-        activeItinerary: testItinerary,
-        status: JourneyStatus.navigating,
-      );
-      final recs = weatherEngine.analyze(journey, 'Heavy Rain Showers');
-      expect(recs.length, 1);
-      expect(recs.first.type, RecommendationType.weather);
-      expect(recs.first.severity, AlertSeverity.warning);
-    });
+    test(
+      'WeatherIntelligence should suggest indoor swap if rain is forecasted',
+      () {
+        const journey = JourneyState(
+          activeItinerary: testItinerary,
+          status: JourneyStatus.navigating,
+        );
+        final recs = weatherEngine.analyze(journey, 'Heavy Rain Showers');
+        expect(recs.length, 1);
+        expect(recs.first.type, RecommendationType.weather);
+        expect(recs.first.severity, AlertSeverity.warning);
+      },
+    );
 
-    test('BudgetIntelligence should trigger critical warning if budget limit exceeded', () {
-      const budgetStatus = BudgetStatus(totalBudget: 1000.0, currentSpent: 1200.0);
-      final recs = budgetEngine.analyze(budgetStatus);
-      expect(recs.length, 1);
-      expect(recs.first.type, RecommendationType.budget);
-      expect(recs.first.severity, AlertSeverity.critical);
-    });
+    test(
+      'BudgetIntelligence should trigger critical warning if budget limit exceeded',
+      () {
+        const budgetStatus = BudgetStatus(
+          totalBudget: 1000.0,
+          currentSpent: 1200.0,
+        );
+        final recs = budgetEngine.analyze(budgetStatus);
+        expect(recs.length, 1);
+        expect(recs.first.type, RecommendationType.budget);
+        expect(recs.first.severity, AlertSeverity.critical);
+      },
+    );
 
-    test('TrafficIntelligence should suggest walking if distance is short and delay is high', () {
-      const journey = JourneyState(
-        activeItinerary: testItinerary,
-        status: JourneyStatus.navigating,
-        distanceToNextMeters: 1200,
-        etaMinutes: 20,
-      );
-      final recs = trafficEngine.analyze(journey);
-      expect(recs.length, 1);
-      expect(recs.first.type, RecommendationType.transit);
-      expect(recs.first.severity, AlertSeverity.info);
-    });
+    test(
+      'TrafficIntelligence should suggest walking if distance is short and delay is high',
+      () {
+        const journey = JourneyState(
+          activeItinerary: testItinerary,
+          status: JourneyStatus.navigating,
+          distanceToNextMeters: 1200,
+          etaMinutes: 20,
+        );
+        final recs = trafficEngine.analyze(journey);
+        expect(recs.length, 1);
+        expect(recs.first.type, RecommendationType.transit);
+        expect(recs.first.severity, AlertSeverity.info);
+      },
+    );
 
-    test('RecommendationEngine should aggregate all engine warnings into list', () {
-      const journey = JourneyState(
-        activeItinerary: testItinerary,
-        status: JourneyStatus.navigating,
-        distanceToNextMeters: 1200,
-        etaMinutes: 20,
-      );
-      const budgetStatus = BudgetStatus(totalBudget: 1000.0, currentSpent: 1200.0);
+    test(
+      'RecommendationEngine should aggregate all engine warnings into list',
+      () {
+        const journey = JourneyState(
+          activeItinerary: testItinerary,
+          status: JourneyStatus.navigating,
+          distanceToNextMeters: 1200,
+          etaMinutes: 20,
+        );
+        const budgetStatus = BudgetStatus(
+          totalBudget: 1000.0,
+          currentSpent: 1200.0,
+        );
 
-      final all = recommendationEngine.generateRecommendations(
-        journeyState: journey,
-        budgetStatus: budgetStatus,
-        weatherInfo: 'Rainy Showers',
-      );
+        final all = recommendationEngine.generateRecommendations(
+          journeyState: journey,
+          budgetStatus: budgetStatus,
+          weatherInfo: 'Rainy Showers',
+        );
 
-      // Verify that weather, transit, and budget aggregations are mapped
-      expect(all.any((r) => r.type == RecommendationType.weather), true);
-      expect(all.any((r) => r.type == RecommendationType.transit), true);
-      expect(all.any((r) => r.type == RecommendationType.budget), true);
-    });
+        // Verify that weather, transit, and budget aggregations are mapped
+        expect(all.any((r) => r.type == RecommendationType.weather), true);
+        expect(all.any((r) => r.type == RecommendationType.transit), true);
+        expect(all.any((r) => r.type == RecommendationType.budget), true);
+      },
+    );
   });
 }

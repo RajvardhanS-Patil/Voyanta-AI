@@ -12,10 +12,10 @@ class SyncStatusBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final connectionStatus = ref.watch(connectivityServiceProvider);
-    
+
     return StreamBuilder<int>(
-      stream: IsarService.isar.syncQueueDbs.watchLazy().map((_) => 
-        IsarService.isar.syncQueueDbs.countSync()
+      stream: IsarService.isar.syncQueueDbs.watchLazy().map(
+        (_) => IsarService.isar.syncQueueDbs.countSync(),
       ),
       initialData: IsarService.isar.syncQueueDbs.countSync(),
       builder: (context, snapshot) {
@@ -84,7 +84,11 @@ class SyncStatusBanner extends ConsumerWidget {
                   ),
                   if (pendingCount > 0 && !isOffline)
                     IconButton(
-                      icon: const Icon(Icons.refresh_outlined, color: Colors.white, size: 20),
+                      icon: const Icon(
+                        Icons.refresh_outlined,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                       onPressed: () {
                         ref.read(syncQueueProcessorProvider).triggerSync();
                       },

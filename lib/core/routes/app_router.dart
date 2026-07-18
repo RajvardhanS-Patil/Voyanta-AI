@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/journey/presentation/screens/live_journey_screen.dart';
 import '../../features/companion/presentation/screens/companion_screen.dart';
@@ -24,10 +23,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       ShellRoute(
         builder: (context, state, child) {
           return DashboardScreen(child: child);

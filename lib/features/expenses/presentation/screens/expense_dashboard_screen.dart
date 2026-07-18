@@ -21,7 +21,10 @@ class ExpenseDashboardScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Budget & Expenses', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Budget & Expenses',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.tealAccent,
@@ -38,16 +41,25 @@ class ExpenseDashboardScreen extends ConsumerWidget {
               children: [
                 BudgetProgressBar(status: status),
                 const SizedBox(height: 32),
-                const Text('Recent Transactions', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Recent Transactions',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 16),
                 Expanded(
                   child: expenses.isEmpty
                       ? EmptyStateView(
                           icon: Icons.receipt_long_outlined,
                           title: 'No Expenses Yet',
-                          description: 'Track your spending to keep your budget healthy. Add your first expense.',
+                          description:
+                              'Track your spending to keep your budget healthy. Add your first expense.',
                           primaryActionLabel: 'Add Expense',
-                          onPrimaryAction: () => ExpenseFormOverlay.show(context),
+                          onPrimaryAction: () =>
+                              ExpenseFormOverlay.show(context),
                         )
                       : ListView.builder(
                           itemCount: expenses.length,
@@ -55,14 +67,28 @@ class ExpenseDashboardScreen extends ConsumerWidget {
                             final expense = expenses[index];
                             return ListTile(
                               leading: CircleAvatar(
-                                backgroundColor: Colors.teal.withValues(alpha: 0.2),
-                                child: const Icon(Icons.receipt, color: Colors.tealAccent),
+                                backgroundColor: Colors.teal.withValues(
+                                  alpha: 0.2,
+                                ),
+                                child: const Icon(
+                                  Icons.receipt,
+                                  color: Colors.tealAccent,
+                                ),
                               ),
-                              title: Text(expense.description, style: const TextStyle(color: Colors.white)),
-                              subtitle: Text(expense.category.name.toUpperCase(), style: const TextStyle(color: Colors.white54)),
+                              title: Text(
+                                expense.description,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              subtitle: Text(
+                                expense.category.name.toUpperCase(),
+                                style: const TextStyle(color: Colors.white54),
+                              ),
                               trailing: Text(
-                                '-\$${expense.amount.toStringAsFixed(2)}', 
-                                style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                                '-\$${expense.amount.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  color: Colors.redAccent,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             );
                           },
@@ -81,16 +107,15 @@ class ExpenseDashboardScreen extends ConsumerWidget {
                 child: Container(
                   height: 180,
                   width: double.infinity,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
               ShimmerLoader(
-                child: Container(
-                  height: 24,
-                  width: 200,
-                  color: Colors.white,
-                ),
+                child: Container(height: 24, width: 200, color: Colors.white),
               ),
               const SizedBox(height: 16),
               Expanded(
@@ -101,7 +126,10 @@ class ExpenseDashboardScreen extends ConsumerWidget {
                     child: ShimmerLoader(
                       child: Container(
                         height: 70,
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                     ),
                   ),
@@ -112,7 +140,8 @@ class ExpenseDashboardScreen extends ConsumerWidget {
         ),
         error: (err, st) => ErrorRecoveryView(
           title: 'Unable to Load Budget',
-          description: 'We couldn\'t load your expenses. Please verify your connection and try again.',
+          description:
+              'We couldn\'t load your expenses. Please verify your connection and try again.',
           onRetry: () {
             ref.invalidate(expenseControllerProvider);
           },

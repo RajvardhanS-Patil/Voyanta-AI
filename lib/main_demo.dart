@@ -8,22 +8,18 @@ import 'package:voyanta_ai/core/observability/observability_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Load dev environment
   await dotenv.load(fileName: ".env.dev");
-  
+
   // Initialize standard services
-  await IsarService.init();
-  ObservabilityService.init();
+  await IsarService.initialize();
+  ObservabilityService.initialize(Environment.dev);
 
   // Drop and re-seed the local database for Demo Mode
   await DemoSeeder.seedDatabase();
 
   ObservabilityService.trackEvent('app_launched_demo_mode');
 
-  runApp(
-    const ProviderScope(
-      child: VoyantaApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: VoyantaApp()));
 }

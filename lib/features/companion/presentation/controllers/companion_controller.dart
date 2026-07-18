@@ -18,22 +18,32 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
   @override
   Future<List<ChatMessage>> build() async {
     _getCompanionResponse = ref.read(getCompanionResponseUseCaseProvider);
-    
+
     // Load previously stored dialogue records from Isar local db
-    final saved = await IsarService.isar.chatMessageDbs.where().sortByTimestamp().findAll();
+    final saved = await IsarService.isar.chatMessageDbs
+        .where()
+        .sortByTimestamp()
+        .findAll();
     if (saved.isNotEmpty) {
-      return saved.map((db) => ChatMessage(
-        id: db.messageId,
-        text: db.text,
-        sender: db.sender == 'user' ? MessageSender.user : MessageSender.assistant,
-        timestamp: db.timestamp,
-      )).toList();
+      return saved
+          .map(
+            (db) => ChatMessage(
+              id: db.messageId,
+              text: db.text,
+              sender: db.sender == 'user'
+                  ? MessageSender.user
+                  : MessageSender.assistant,
+              timestamp: db.timestamp,
+            ),
+          )
+          .toList();
     }
 
     // Seed initial contextual greeting
     final initMsg = ChatMessage(
       id: 'init',
-      text: "Hello! I'm your Voyanta AI Travel Companion. I'm connected to your active itinerary and live budget trackers. Ask me anything about local dining, budget optimization, or timing adjustments!",
+      text:
+          "Hello! I'm your Voyanta AI Travel Companion. I'm connected to your active itinerary and live budget trackers. Ask me anything about local dining, budget optimization, or timing adjustments!",
       sender: MessageSender.assistant,
       timestamp: DateTime.now(),
     );
@@ -48,7 +58,7 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
       ..text = message.text
       ..sender = message.sender == MessageSender.user ? 'user' : 'assistant'
       ..timestamp = message.timestamp;
-    
+
     await IsarService.isar.writeTxn(() async {
       await IsarService.isar.chatMessageDbs.put(db);
     });
@@ -56,7 +66,7 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
 
   Future<void> sendMessage(String text) async {
     final currentList = state.value ?? [];
-    
+
     final userMessage = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       text: text,
@@ -73,7 +83,8 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
     if (connection == ConnectionStatus.offline) {
       final offlineReply = ChatMessage(
         id: 'offline_${DateTime.now().millisecondsSinceEpoch}',
-        text: "I am currently offline. I cannot access the live AI travel companion server, but you can still view your offline itineraries, saved budget expenses, and conversation archives.",
+        text:
+            "I am currently offline. I cannot access the live AI travel companion server, but you can still view your offline itineraries, saved budget expenses, and conversation archives.",
         sender: MessageSender.assistant,
         timestamp: DateTime.now(),
       );
@@ -83,32 +94,40 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
     }
 
     // Append typing placeholder
-    state = AsyncValue.data([...state.value!, ChatMessage(
-      id: 'typing',
-      text: '',
-      sender: MessageSender.assistant,
-      timestamp: DateTime.now(),
-    )]);
+    state = AsyncValue.data([
+      ...state.value!,
+      ChatMessage(
+        id: 'typing',
+        text: '',
+        sender: MessageSender.assistant,
+        timestamp: DateTime.now(),
+      ),
+    ]);
 
     try {
       final context = _buildContext();
       final history = state.value!.where((msg) => msg.id != 'typing').toList();
-      
+
       final assistantMessage = await _getCompanionResponse(
         history: history,
         context: context,
       );
 
       // Swap out typing indicator for AI reply
-      final finalMessages = state.value!.where((msg) => msg.id != 'typing').toList();
+      final finalMessages = state.value!
+          .where((msg) => msg.id != 'typing')
+          .toList();
       state = AsyncData([...finalMessages, assistantMessage]);
       await _saveMessageToDb(assistantMessage);
       ObservabilityService.trackEvent('ai_request', {'success': true});
     } catch (e, st) {
-      final finalMessages = state.value!.where((msg) => msg.id != 'typing').toList();
+      final finalMessages = state.value!
+          .where((msg) => msg.id != 'typing')
+          .toList();
       final errorReply = ChatMessage(
         id: 'error_${DateTime.now().millisecondsSinceEpoch}',
-        text: "I'm having trouble connecting to the travel grid. Please check your API key in .env.",
+        text:
+            "I'm having trouble connecting to the travel grid. Please check your API key in .env.",
         sender: MessageSender.assistant,
         timestamp: DateTime.now(),
       );
@@ -125,7 +144,7 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
     final budgetStatus = budgetCalculator(expenses);
 
     final itinerary = journeyState.activeItinerary;
-    
+
     final destination = itinerary?.theme ?? "Unknown Destination";
     final theme = itinerary?.theme ?? "General Travel";
     final dayNum = itinerary?.dayNumber ?? 1;
@@ -158,6 +177,7 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
   }
 }
 
-final companionControllerProvider = AsyncNotifierProvider<CompanionController, List<ChatMessage>>(() {
-  return CompanionController();
-});
+final companionControllerProvider =
+    AsyncNotifierProvider<CompanionController, List<ChatMessage>>(() {
+      return CompanionController();
+    });

@@ -36,13 +36,17 @@ class CompanionContext {
     String? weatherInfo,
   }) {
     return CompanionContext(
-      activeTripDestination: activeTripDestination ?? this.activeTripDestination,
+      activeTripDestination:
+          activeTripDestination ?? this.activeTripDestination,
       activeTripTheme: activeTripTheme ?? this.activeTripTheme,
       activeTripDayNumber: activeTripDayNumber ?? this.activeTripDayNumber,
-      completedActivityTitles: completedActivityTitles ?? this.completedActivityTitles,
+      completedActivityTitles:
+          completedActivityTitles ?? this.completedActivityTitles,
       nextActivityTitle: nextActivityTitle ?? this.nextActivityTitle,
-      nextActivityDistanceKm: nextActivityDistanceKm ?? this.nextActivityDistanceKm,
-      nextActivityEtaMinutes: nextActivityEtaMinutes ?? this.nextActivityEtaMinutes,
+      nextActivityDistanceKm:
+          nextActivityDistanceKm ?? this.nextActivityDistanceKm,
+      nextActivityEtaMinutes:
+          nextActivityEtaMinutes ?? this.nextActivityEtaMinutes,
       totalBudget: totalBudget ?? this.totalBudget,
       totalSpent: totalSpent ?? this.totalSpent,
       weatherInfo: weatherInfo ?? this.weatherInfo,

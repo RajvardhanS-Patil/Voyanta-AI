@@ -14,12 +14,13 @@ class ScheduleIntelligenceEngine {
           type: RecommendationType.schedule,
           severity: AlertSeverity.warning,
           title: 'Schedule Timing Alert',
-          description: 'ETA to destination is high. You risk running late for upcoming scheduled openings. Reorder itinerary if needed.',
+          description:
+              'ETA to destination is high. You risk running late for upcoming scheduled openings. Reorder itinerary if needed.',
           actionLabel: 'Reschedule',
         ),
       );
     }
-    
+
     return recommendations;
   }
 }

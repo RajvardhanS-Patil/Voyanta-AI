@@ -1,4 +1,13 @@
-enum RecommendationType { weather, budget, schedule, food, safety, transit, nearby }
+enum RecommendationType {
+  weather,
+  budget,
+  schedule,
+  food,
+  safety,
+  transit,
+  nearby,
+}
+
 enum AlertSeverity { info, warning, critical }
 
 class TravelRecommendation {

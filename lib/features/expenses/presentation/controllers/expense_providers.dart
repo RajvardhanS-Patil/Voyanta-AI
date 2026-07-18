@@ -8,6 +8,7 @@ final expenseRepositoryProvider = Provider<ExpenseRepository>((ref) {
 });
 
 // Assume a generic $5,000 budget for the MVP demo
-final calculateBudgetHealthUseCaseProvider = Provider<CalculateBudgetHealthUseCase>((ref) {
-  return CalculateBudgetHealthUseCase(totalBudget: 5000.0);
-});
+final calculateBudgetHealthUseCaseProvider =
+    Provider<CalculateBudgetHealthUseCase>((ref) {
+      return CalculateBudgetHealthUseCase(totalBudget: 5000.0);
+    });

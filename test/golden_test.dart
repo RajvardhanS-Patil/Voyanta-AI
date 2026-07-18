@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:voyanta_ai/core/ux/empty_state_view.dart';
 import 'package:voyanta_ai/core/ux/error_recovery_view.dart';

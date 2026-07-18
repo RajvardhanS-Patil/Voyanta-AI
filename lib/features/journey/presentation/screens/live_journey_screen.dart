@@ -61,7 +61,9 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
 
     // If journey is not active, display the Start Dashboard / Permissions controller
     if (!hasActiveJourney) {
-      final journeyState = ref.read(journeyControllerProvider); // read once for start screen
+      final journeyState = ref.read(
+        journeyControllerProvider,
+      ); // read once for start screen
       return _buildStartScreen(journeyState);
     }
 
@@ -74,11 +76,19 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
         leading: const Icon(Icons.location_on, color: Colors.tealAccent),
         title: const Text(
           'Live Route Tracker',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontFamily: 'Outfit'),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Outfit',
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.stop_circle_outlined, color: Colors.redAccent, size: 28),
+            icon: const Icon(
+              Icons.stop_circle_outlined,
+              color: Colors.redAccent,
+              size: 28,
+            ),
             onPressed: () {
               ref.read(journeyControllerProvider.notifier).endJourney();
             },
@@ -112,7 +122,9 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   itemCount: recommendations.length,
                   itemBuilder: (context, index) {
-                    return RecommendationCard(recommendation: recommendations[index]);
+                    return RecommendationCard(
+                      recommendation: recommendations[index],
+                    );
                   },
                 ),
               ),
@@ -143,7 +155,11 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.explore_outlined, color: Colors.tealAccent, size: 80),
+                const Icon(
+                  Icons.explore_outlined,
+                  color: Colors.tealAccent,
+                  size: 80,
+                ),
                 const SizedBox(height: 24),
                 const Text(
                   'Live Journey Engine',
@@ -158,7 +174,12 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
                 const Text(
                   'Transform your static travel plan into a real-time guided tour with automatic arrival alerts and live GPS tracking.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70, fontSize: 14, fontFamily: 'Inter', height: 1.5),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                    fontFamily: 'Inter',
+                    height: 1.5,
+                  ),
                 ),
                 const SizedBox(height: 32),
 
@@ -170,17 +191,25 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
                     decoration: BoxDecoration(
                       color: Colors.redAccent.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5)),
+                      border: Border.all(
+                        color: Colors.redAccent.withValues(alpha: 0.5),
+                      ),
                     ),
                     child: const Column(
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+                            Icon(
+                              Icons.warning_amber_rounded,
+                              color: Colors.redAccent,
+                            ),
                             SizedBox(width: 8),
                             Text(
                               'Location Access Denied',
-                              style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: Colors.redAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -200,7 +229,9 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
                   ),
                   child: const Row(
                     children: [
@@ -211,7 +242,7 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
                           'Equipped with background tracking capabilities. Voyanta safely monitors progress even when your screen is locked.',
                           style: TextStyle(color: Colors.white60, fontSize: 12),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -219,7 +250,9 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
                 VoyantaButton(
                   label: 'Start Journey',
                   onPressed: () {
-                    ref.read(journeyControllerProvider.notifier).startJourney(_testItinerary);
+                    ref
+                        .read(journeyControllerProvider.notifier)
+                        .startJourney(_testItinerary);
                   },
                 ),
               ],
@@ -279,7 +312,9 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                isArrived ? '🎯 ARRIVED AT DESTINATION' : '⏳ ACTIVE ROUTE STATE',
+                isArrived
+                    ? '🎯 ARRIVED AT DESTINATION'
+                    : '⏳ ACTIVE ROUTE STATE',
                 style: TextStyle(
                   color: isArrived ? Colors.tealAccent : Colors.white54,
                   fontWeight: FontWeight.bold,
@@ -290,7 +325,11 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
               const SizedBox(height: 8),
               Text(
                 activity.title,
-                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 4),
@@ -306,12 +345,17 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
                         foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       icon: const Icon(Icons.navigation),
                       label: const Text('Navigate'),
-                      onPressed: () => _launchMapsIntent(activity.latitude, activity.longitude),
+                      onPressed: () => _launchMapsIntent(
+                        activity.latitude,
+                        activity.longitude,
+                      ),
                     ),
                   ),
                   if (isArrived) ...[
@@ -321,13 +365,17 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white12,
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                         icon: const Icon(Icons.check_circle_outline),
                         label: const Text('Complete'),
                         onPressed: () {
-                          ref.read(journeyControllerProvider.notifier).advanceToNextActivity();
+                          ref
+                              .read(journeyControllerProvider.notifier)
+                              .advanceToNextActivity();
                         },
                       ),
                     ),
@@ -347,9 +395,13 @@ class _DraggableTimelineSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activeItinerary = ref.watch(journeyControllerProvider.select((s) => s.activeItinerary));
-    final currentActivityIndex = ref.watch(journeyControllerProvider.select((s) => s.currentActivityIndex));
-    
+    final activeItinerary = ref.watch(
+      journeyControllerProvider.select((s) => s.activeItinerary),
+    );
+    final currentActivityIndex = ref.watch(
+      journeyControllerProvider.select((s) => s.currentActivityIndex),
+    );
+
     final totalActivities = activeItinerary?.activities.length ?? 1;
     final completedCount = currentActivityIndex;
     final progressFraction = completedCount / totalActivities;
@@ -366,13 +418,20 @@ class _DraggableTimelineSheet extends ConsumerWidget {
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B).withValues(alpha: 0.9), // Glass panel
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                color: const Color(
+                  0xFF1E293B,
+                ).withValues(alpha: 0.9), // Glass panel
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               ),
               child: ListView(
                 controller: scrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 children: [
                   // Center drag indicator line
                   Align(
@@ -394,11 +453,19 @@ class _DraggableTimelineSheet extends ConsumerWidget {
                     children: [
                       const Text(
                         'Journey Timeline',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                       Text(
                         '$completedCount / $totalActivities completed',
-                        style: const TextStyle(color: Colors.tealAccent, fontSize: 12, fontWeight: FontWeight.w600),
+                        style: const TextStyle(
+                          color: Colors.tealAccent,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
@@ -424,7 +491,12 @@ class _DraggableTimelineSheet extends ConsumerWidget {
                       final isCompleted = index < currentActivityIndex;
                       final isActive = index == currentActivityIndex;
 
-                      return _buildTimelineItem(act, isCompleted, isActive, index == activities.length - 1);
+                      return _buildTimelineItem(
+                        act,
+                        isCompleted,
+                        isActive,
+                        index == activities.length - 1,
+                      );
                     },
                   ),
                 ],
@@ -436,7 +508,12 @@ class _DraggableTimelineSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildTimelineItem(Activity activity, bool isCompleted, bool isActive, bool isLast) {
+  Widget _buildTimelineItem(
+    Activity activity,
+    bool isCompleted,
+    bool isActive,
+    bool isLast,
+  ) {
     Color dotColor = Colors.white24;
     IconData icon = Icons.circle_outlined;
     TextStyle titleStyle = const TextStyle(color: Colors.white70, fontSize: 14);
@@ -444,11 +521,19 @@ class _DraggableTimelineSheet extends ConsumerWidget {
     if (isCompleted) {
       dotColor = Colors.tealAccent;
       icon = Icons.check_circle;
-      titleStyle = const TextStyle(color: Colors.white38, fontSize: 14, decoration: TextDecoration.lineThrough);
+      titleStyle = const TextStyle(
+        color: Colors.white38,
+        fontSize: 14,
+        decoration: TextDecoration.lineThrough,
+      );
     } else if (isActive) {
       dotColor = Colors.purpleAccent;
       icon = Icons.gps_fixed;
-      titleStyle = const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold);
+      titleStyle = const TextStyle(
+        color: Colors.white,
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+      );
     }
 
     return IntrinsicHeight(
@@ -492,7 +577,9 @@ class _DraggableTimelineSheet extends ConsumerWidget {
                       style: TextStyle(
                         color: isActive ? Colors.purpleAccent : Colors.white30,
                         fontSize: 12,
-                        fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isActive
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ],

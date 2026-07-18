@@ -19,7 +19,8 @@ class VoyantaButton extends StatefulWidget {
   State<VoyantaButton> createState() => _VoyantaButtonState();
 }
 
-class _VoyantaButtonState extends State<VoyantaButton> with SingleTickerProviderStateMixin {
+class _VoyantaButtonState extends State<VoyantaButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
@@ -30,9 +31,10 @@ class _VoyantaButtonState extends State<VoyantaButton> with SingleTickerProvider
       vsync: this,
       duration: const Duration(milliseconds: 100),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -92,7 +94,9 @@ class _VoyantaButtonState extends State<VoyantaButton> with SingleTickerProvider
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: BorderRadius.circular(16),
-              border: widget.isSecondary ? Border.all(color: Colors.tealAccent) : null,
+              border: widget.isSecondary
+                  ? Border.all(color: Colors.tealAccent)
+                  : null,
             ),
             child: Center(
               child: widget.isLoading

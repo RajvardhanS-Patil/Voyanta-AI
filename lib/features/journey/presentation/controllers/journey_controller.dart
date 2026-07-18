@@ -34,17 +34,21 @@ class JourneyController extends Notifier<JourneyState> {
 
   Future<void> _restoreJourneyProgress() async {
     try {
-      final progress = await IsarService.isar.journeyProgressDbs.where().findFirst();
+      final progress = await IsarService.isar.journeyProgressDbs
+          .where()
+          .findFirst();
       if (progress != null && progress.activeItineraryJson != null) {
-        final itineraryMap = jsonDecode(progress.activeItineraryJson!) as Map<String, dynamic>;
+        final itineraryMap =
+            jsonDecode(progress.activeItineraryJson!) as Map<String, dynamic>;
         final itinerary = TripItineraryModel.fromJson(itineraryMap);
-        
+
         final statusVal = JourneyStatus.values.firstWhere(
           (s) => s.name == progress.status,
           orElse: () => JourneyStatus.idle,
         );
 
-        if (statusVal == JourneyStatus.completed || statusVal == JourneyStatus.idle) {
+        if (statusVal == JourneyStatus.completed ||
+            statusVal == JourneyStatus.idle) {
           return;
         }
 
@@ -57,7 +61,9 @@ class JourneyController extends Notifier<JourneyState> {
         );
 
         _positionSubscription?.cancel();
-        _positionSubscription = _locationRepo.getLocationStream().listen((position) {
+        _positionSubscription = _locationRepo.getLocationStream().listen((
+          position,
+        ) {
           _updateStateWithPosition(position);
         });
       }
@@ -68,13 +74,17 @@ class JourneyController extends Notifier<JourneyState> {
     return {
       'dayNumber': itinerary.dayNumber,
       'theme': itinerary.theme,
-      'activities': itinerary.activities.map((a) => {
-        'time': a.time,
-        'title': a.title,
-        'description': a.description,
-        'latitude': a.latitude,
-        'longitude': a.longitude,
-      }).toList(),
+      'activities': itinerary.activities
+          .map(
+            (a) => {
+              'time': a.time,
+              'title': a.title,
+              'description': a.description,
+              'latitude': a.latitude,
+              'longitude': a.longitude,
+            },
+          )
+          .toList(),
     };
   }
 
@@ -126,7 +136,9 @@ class JourneyController extends Notifier<JourneyState> {
     }
 
     _positionSubscription?.cancel();
-    _positionSubscription = _locationRepo.getLocationStream().listen((position) {
+    _positionSubscription = _locationRepo.getLocationStream().listen((
+      position,
+    ) {
       _updateStateWithPosition(position);
     });
 

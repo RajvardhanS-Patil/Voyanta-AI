@@ -20,7 +20,8 @@ class _ItineraryMapViewState extends ConsumerState<ItineraryMapView> {
 
   Future<void> _onMapCreated(MapboxMap mapboxMap) async {
     this.mapboxMap = mapboxMap;
-    annotationManager = await mapboxMap.annotations.createPointAnnotationManager();
+    annotationManager = await mapboxMap.annotations
+        .createPointAnnotationManager();
     _rebuildAnnotations();
   }
 
@@ -38,13 +39,16 @@ class _ItineraryMapViewState extends ConsumerState<ItineraryMapView> {
 
     if (journey.hasActiveJourney) {
       final itinerary = journey.activeItinerary!;
-      
+
       // Dynamic GPS: Draw user current location indicator
       if (journey.currentLatitude != 0.0 && journey.currentLongitude != 0.0) {
         annotations.add(
           PointAnnotationOptions(
             geometry: Point(
-              coordinates: Position(journey.currentLongitude, journey.currentLatitude),
+              coordinates: Position(
+                journey.currentLongitude,
+                journey.currentLatitude,
+              ),
             ),
             textField: "📍 My Location",
             textColor: 0xFF2DD4BF, // Cyber Teal Accent
@@ -76,9 +80,7 @@ class _ItineraryMapViewState extends ConsumerState<ItineraryMapView> {
 
         annotations.add(
           PointAnnotationOptions(
-            geometry: Point(
-              coordinates: Position(act.longitude, act.latitude),
-            ),
+            geometry: Point(coordinates: Position(act.longitude, act.latitude)),
             textField: "$prefix${act.title}",
             textColor: color,
             iconImage: 'marker-15',
@@ -132,12 +134,17 @@ class _ItineraryMapViewState extends ConsumerState<ItineraryMapView> {
       if (!journey.hasActiveJourney) {
         _rebuildAnnotations();
         if (next.cameraOptions != null && mapboxMap != null) {
-          mapboxMap?.flyTo(next.cameraOptions!, MapAnimationOptions(duration: 1000));
+          mapboxMap?.flyTo(
+            next.cameraOptions!,
+            MapAnimationOptions(duration: 1000),
+          );
         }
       }
     });
 
-    if (publicToken == null || publicToken.isEmpty || publicToken.startsWith('mock')) {
+    if (publicToken == null ||
+        publicToken.isEmpty ||
+        publicToken.startsWith('mock')) {
       return ShimmerLoader(
         child: Container(
           color: const Color(0xFF1E293B),
@@ -149,7 +156,11 @@ class _ItineraryMapViewState extends ConsumerState<ItineraryMapView> {
                 SizedBox(height: 16),
                 Text(
                   'Loading Map Data...',
-                  style: TextStyle(color: Colors.white70, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),

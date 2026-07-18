@@ -6,7 +6,7 @@ import 'collections/cache_entry_db.dart';
 class CacheManager {
   // In-memory cache layer for rapid reads
   final Map<String, _MemoryCacheEntry> _memoryCache = {};
-  
+
   // Cache statistics
   int _hits = 0;
   int _misses = 0;
@@ -16,16 +16,13 @@ class CacheManager {
 
   Future<void> put(String key, Map<String, dynamic> data, Duration ttl) async {
     final expiresAt = DateTime.now().add(ttl);
-    
+
     // Cache in memory
-    _memoryCache[key] = _MemoryCacheEntry(
-      data: data,
-      expiresAt: expiresAt,
-    );
+    _memoryCache[key] = _MemoryCacheEntry(data: data, expiresAt: expiresAt);
 
     // Persist to Isar local database
     final jsonStr = jsonEncode(data);
-    
+
     await IsarService.isar.writeTxn(() async {
       final entry = CacheEntryDb()
         ..cacheKey = key
@@ -50,13 +47,19 @@ class CacheManager {
     }
 
     // Check Isar local database persistence
-    final entry = await IsarService.isar.cacheEntryDbs.filter().cacheKeyEqualTo(key).findFirst();
+    final entry = await IsarService.isar.cacheEntryDbs
+        .filter()
+        .cacheKeyEqualTo(key)
+        .findFirst();
     if (entry != null) {
       if (entry.expiresAt.isAfter(now)) {
         _hits++;
         final decoded = jsonDecode(entry.valueJson) as Map<String, dynamic>;
         // Restore to memory cache
-        _memoryCache[key] = _MemoryCacheEntry(data: decoded, expiresAt: entry.expiresAt);
+        _memoryCache[key] = _MemoryCacheEntry(
+          data: decoded,
+          expiresAt: entry.expiresAt,
+        );
         return decoded;
       } else {
         // Evict expired database entry
@@ -72,7 +75,10 @@ class CacheManager {
 
   Future<void> invalidate(String key) async {
     _memoryCache.remove(key);
-    final entry = await IsarService.isar.cacheEntryDbs.filter().cacheKeyEqualTo(key).findFirst();
+    final entry = await IsarService.isar.cacheEntryDbs
+        .filter()
+        .cacheKeyEqualTo(key)
+        .findFirst();
     if (entry != null) {
       await IsarService.isar.writeTxn(() async {
         await IsarService.isar.cacheEntryDbs.delete(entry.id);
@@ -83,9 +89,12 @@ class CacheManager {
   Future<void> cleanup() async {
     final now = DateTime.now();
     _memoryCache.removeWhere((key, entry) => entry.expiresAt.isBefore(now));
-    
+
     await IsarService.isar.writeTxn(() async {
-      await IsarService.isar.cacheEntryDbs.filter().expiresAtLessThan(now).deleteAll();
+      await IsarService.isar.cacheEntryDbs
+          .filter()
+          .expiresAtLessThan(now)
+          .deleteAll();
     });
   }
 

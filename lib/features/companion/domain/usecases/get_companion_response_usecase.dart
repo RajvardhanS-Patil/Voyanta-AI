@@ -11,9 +11,6 @@ class GetCompanionResponseUseCase {
     required List<ChatMessage> history,
     required CompanionContext context,
   }) {
-    return _repository.getCompanionResponse(
-      history: history,
-      context: context,
-    );
+    return _repository.getCompanionResponse(history: history, context: context);
   }
 }

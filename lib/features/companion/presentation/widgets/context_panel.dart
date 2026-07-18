@@ -15,7 +15,8 @@ class ContextPanel extends ConsumerWidget {
     final budgetCalculator = ref.watch(calculateBudgetHealthUseCaseProvider);
     final budgetStatus = budgetCalculator(expenses);
 
-    final nextActivity = journeyState.currentActivity?.title ?? "Empire State Building";
+    final nextActivity =
+        journeyState.currentActivity?.title ?? "Empire State Building";
     final dist = journeyState.distanceToNextMeters / 1000.0;
     final eta = journeyState.etaMinutes;
 
@@ -41,7 +42,11 @@ class ContextPanel extends ConsumerWidget {
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.dashboard_customize_outlined, color: Colors.tealAccent, size: 18),
+                        Icon(
+                          Icons.dashboard_customize_outlined,
+                          color: Colors.tealAccent,
+                          size: 18,
+                        ),
                         SizedBox(width: 8),
                         Text(
                           'Voyanta Smart Context',
@@ -55,14 +60,21 @@ class ContextPanel extends ConsumerWidget {
                       ],
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.teal.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
                         'Active Trip',
-                        style: TextStyle(color: Colors.tealAccent, fontSize: 10, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: Colors.tealAccent,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -75,11 +87,21 @@ class ContextPanel extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Destination', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                          const Text(
+                            'Destination',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 11,
+                            ),
+                          ),
                           const SizedBox(height: 2),
                           const Text(
                             'New York City',
-                            style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -90,11 +112,21 @@ class ContextPanel extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Remaining Budget', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                          const Text(
+                            'Remaining Budget',
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 11,
+                            ),
+                          ),
                           const SizedBox(height: 2),
                           Text(
                             '\$${budgetStatus.remaining.toStringAsFixed(2)}',
-                            style: const TextStyle(color: Colors.tealAccent, fontSize: 13, fontWeight: FontWeight.w600),
+                            style: const TextStyle(
+                              color: Colors.tealAccent,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -106,12 +138,19 @@ class ContextPanel extends ConsumerWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const Icon(Icons.location_on, color: Colors.white54, size: 14),
+                    const Icon(
+                      Icons.location_on,
+                      color: Colors.white54,
+                      size: 14,
+                    ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         'Next: $nextActivity (${dist > 0 ? dist.toStringAsFixed(1) : "1.8"} km | ${eta > 0 ? eta : "12"} mins)',
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

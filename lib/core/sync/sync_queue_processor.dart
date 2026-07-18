@@ -32,7 +32,7 @@ class SyncQueueProcessor {
           .where()
           .sortByTimestamp()
           .findAll();
-      
+
       for (final item in queueItems) {
         final success = await _processItem(item);
         if (success) {
@@ -43,7 +43,7 @@ class SyncQueueProcessor {
           break;
         }
       }
-      
+
       if (queueItems.isNotEmpty) {
         ObservabilityService.trackEvent('offline_sync_completed', {
           'synced_items_count': queueItems.length,
@@ -60,7 +60,7 @@ class SyncQueueProcessor {
     try {
       // Decode payload to verify JSON format validity
       jsonDecode(item.payloadJson);
-      
+
       switch (item.type) {
         case 'add_expense':
           await Future.delayed(const Duration(milliseconds: 300));

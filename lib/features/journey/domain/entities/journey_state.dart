@@ -14,7 +14,8 @@ class JourneyState {
   final bool permissionDenied;
 
   // Active status helper flags
-  bool get hasActiveJourney => status != JourneyStatus.idle && activeItinerary != null;
+  bool get hasActiveJourney =>
+      status != JourneyStatus.idle && activeItinerary != null;
 
   Activity? get currentActivity {
     if (activeItinerary == null ||

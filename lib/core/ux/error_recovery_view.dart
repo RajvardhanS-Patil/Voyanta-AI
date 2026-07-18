@@ -26,7 +26,9 @@ class ErrorRecoveryView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: isOffline ? Colors.orange.withValues(alpha: 0.1) : Colors.redAccent.withValues(alpha: 0.1),
+                color: isOffline
+                    ? Colors.orange.withValues(alpha: 0.1)
+                    : Colors.redAccent.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -39,9 +41,7 @@ class ErrorRecoveryView extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -49,9 +49,8 @@ class ErrorRecoveryView extends StatelessWidget {
             Text(
               description,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Colors.white60,
-                fontSize: 16,
                 height: 1.5,
               ),
             ),
@@ -59,11 +58,17 @@ class ErrorRecoveryView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
-              label: const Text('Try Again', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              label: const Text(
+                'Try Again',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white12,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),

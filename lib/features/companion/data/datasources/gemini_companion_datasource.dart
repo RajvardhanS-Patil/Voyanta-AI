@@ -13,7 +13,8 @@ class GeminiCompanionDataSource implements CompanionRemoteDataSource {
     required List<ChatMessage> history,
     required CompanionContext context,
   }) async {
-    final systemPrompt = '''
+    final systemPrompt =
+        '''
 You are "Voyanta AI", a premium, context-aware AI Travel Companion.
 You are assisting the user during their trip.
 
@@ -47,7 +48,7 @@ Directives:
 
     try {
       final List<Content> contents = [];
-      
+
       // Add system context guide
       contents.add(Content.system(systemPrompt));
 

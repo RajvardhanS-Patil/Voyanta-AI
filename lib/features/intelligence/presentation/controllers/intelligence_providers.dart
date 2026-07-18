@@ -12,13 +12,25 @@ import '../../domain/engines/traffic_intelligence.dart';
 import '../../domain/engines/weather_intelligence.dart';
 import '../../domain/entities/travel_recommendation.dart';
 
-final weatherIntelligenceProvider = Provider((ref) => WeatherIntelligenceEngine());
-final trafficIntelligenceProvider = Provider((ref) => TrafficIntelligenceEngine());
-final budgetIntelligenceProvider = Provider((ref) => BudgetIntelligenceEngine());
-final scheduleIntelligenceProvider = Provider((ref) => ScheduleIntelligenceEngine());
+final weatherIntelligenceProvider = Provider(
+  (ref) => WeatherIntelligenceEngine(),
+);
+final trafficIntelligenceProvider = Provider(
+  (ref) => TrafficIntelligenceEngine(),
+);
+final budgetIntelligenceProvider = Provider(
+  (ref) => BudgetIntelligenceEngine(),
+);
+final scheduleIntelligenceProvider = Provider(
+  (ref) => ScheduleIntelligenceEngine(),
+);
 final foodIntelligenceProvider = Provider((ref) => FoodIntelligenceEngine());
-final safetyIntelligenceProvider = Provider((ref) => SafetyIntelligenceEngine());
-final nearbyIntelligenceProvider = Provider((ref) => NearbyIntelligenceEngine());
+final safetyIntelligenceProvider = Provider(
+  (ref) => SafetyIntelligenceEngine(),
+);
+final nearbyIntelligenceProvider = Provider(
+  (ref) => NearbyIntelligenceEngine(),
+);
 
 final recommendationEngineProvider = Provider<RecommendationEngine>((ref) {
   return RecommendationEngine(
@@ -33,16 +45,18 @@ final recommendationEngineProvider = Provider<RecommendationEngine>((ref) {
 });
 
 // Listens to Journey, Expenses, and Weather details to return active recommendations
-final activeRecommendationsProvider = Provider<List<TravelRecommendation>>((ref) {
+final activeRecommendationsProvider = Provider<List<TravelRecommendation>>((
+  ref,
+) {
   final journey = ref.watch(journeyControllerProvider);
   final expenses = ref.watch(expenseControllerProvider).value ?? [];
   final budgetCalculator = ref.watch(calculateBudgetHealthUseCaseProvider);
-  
+
   final budgetStatus = budgetCalculator(expenses);
   final engine = ref.read(recommendationEngineProvider);
 
   // Seed default weather state to trigger proactive warning cards for demonstration
-  const weatherInfo = "Showers & Rainy"; 
+  const weatherInfo = "Showers & Rainy";
 
   return engine.generateRecommendations(
     journeyState: journey,

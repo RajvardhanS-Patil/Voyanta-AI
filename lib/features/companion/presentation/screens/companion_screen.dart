@@ -23,7 +23,7 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
     "🍔 Food suggestions nearby",
     "💰 Check my budget status",
     "🌤️ Should I adjust for weather?",
-    "🗺️ Local transit tips"
+    "🗺️ Local transit tips",
   ];
 
   @override
@@ -80,7 +80,7 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
           children: [
             // Floating Smart Context Panel
             const ContextPanel(),
-            
+
             // Chat Message Board
             Expanded(
               child: messagesAsync.when(
@@ -89,7 +89,8 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
                     return const EmptyStateView(
                       icon: Icons.chat_bubble_outline,
                       title: 'How can I help?',
-                      description: 'Ask me about your budget, itinerary, or local recommendations.',
+                      description:
+                          'Ask me about your budget, itinerary, or local recommendations.',
                     );
                   }
                   return ListView.builder(
@@ -99,7 +100,10 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
                       final msg = messages[index];
                       if (msg.id == 'typing') {
                         return const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: TypingIndicator(),
@@ -115,9 +119,14 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
                   itemBuilder: (context, index) {
                     final isUser = index % 2 == 0;
                     return Align(
-                      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: isUser
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         child: ShimmerLoader(
                           child: Container(
                             height: 60,
@@ -134,7 +143,8 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
                 ),
                 error: (err, st) => ErrorRecoveryView(
                   title: 'Companion Unavailable',
-                  description: 'Unable to connect to the AI service. Please check your connection.',
+                  description:
+                      'Unable to connect to the AI service. Please check your connection.',
                   onRetry: () {
                     ref.invalidate(companionControllerProvider);
                   },
@@ -157,8 +167,11 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
                       backgroundColor: const Color(0xFF1E293B),
                       side: const BorderSide(color: Colors.white10),
                       label: Text(
-                        suggestion, 
-                        style: const TextStyle(color: Colors.tealAccent, fontSize: 12),
+                        suggestion,
+                        style: const TextStyle(
+                          color: Colors.tealAccent,
+                          fontSize: 12,
+                        ),
                       ),
                       onPressed: () => _send(suggestion),
                     ),
@@ -187,7 +200,10 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
                         decoration: const InputDecoration(
                           hintText: 'Ask Voyanta anything...',
                           hintStyle: TextStyle(color: Colors.white30),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           border: InputBorder.none,
                         ),
                         onSubmitted: (val) => _send(val),
@@ -200,7 +216,11 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
                     child: CircleAvatar(
                       backgroundColor: Colors.tealAccent,
                       radius: 22,
-                      child: const Icon(Icons.send, color: Colors.black, size: 20),
+                      child: const Icon(
+                        Icons.send,
+                        color: Colors.black,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],

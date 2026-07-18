@@ -24,13 +24,10 @@ void main() {
   setUpAll(() async {
     await Isar.initializeIsarCore(download: true);
     tempDir = await Directory.systemTemp.createTemp('isar_test');
-    IsarService.isar = await Isar.open(
-      [
-        CacheEntryDbSchema,
-        SyncQueueDbSchema,
-      ],
-      directory: tempDir.path,
-    );
+    IsarService.isar = await Isar.open([
+      CacheEntryDbSchema,
+      SyncQueueDbSchema,
+    ], directory: tempDir.path);
   });
 
   tearDownAll(() async {
@@ -46,19 +43,26 @@ void main() {
       await cacheManager.clear();
     });
 
-    test('CacheManager should store and retrieve valid entries within TTL', () async {
-      await cacheManager.put('key1', {'foo': 'bar'}, const Duration(seconds: 5));
-      
-      final data = await cacheManager.get('key1');
-      expect(data, isNotNull);
-      expect(data!['foo'], 'bar');
-      expect(cacheManager.hits, 1);
-    });
+    test(
+      'CacheManager should store and retrieve valid entries within TTL',
+      () async {
+        await cacheManager.put('key1', {
+          'foo': 'bar',
+        }, const Duration(seconds: 5));
+
+        final data = await cacheManager.get('key1');
+        expect(data, isNotNull);
+        expect(data!['foo'], 'bar');
+        expect(cacheManager.hits, 1);
+      },
+    );
 
     test('CacheManager should return null and evict expired entries', () async {
-      await cacheManager.put('key2', {'foo': 'bar'}, const Duration(milliseconds: 10));
+      await cacheManager.put('key2', {
+        'foo': 'bar',
+      }, const Duration(milliseconds: 10));
       await Future.delayed(const Duration(milliseconds: 20));
-      
+
       final data = await cacheManager.get('key2');
       expect(data, isNull);
       expect(cacheManager.misses, 1);
@@ -67,7 +71,7 @@ void main() {
     test('CacheManager should support manual invalidation', () async {
       await cacheManager.put('key3', {'foo': 'bar'}, const Duration(hours: 1));
       await cacheManager.invalidate('key3');
-      
+
       final data = await cacheManager.get('key3');
       expect(data, isNull);
     });
@@ -114,30 +118,33 @@ void main() {
       });
     });
 
-    test('SyncQueueProcessor should run FIFO queue successfully when triggered', () async {
-      final container = ProviderContainer();
-      
-      final op1 = SyncQueueDb()
-        ..operationId = '1'
-        ..type = 'add_expense'
-        ..payloadJson = jsonEncode({'amount': 100.0})
-        ..timestamp = DateTime.now().subtract(const Duration(seconds: 1));
+    test(
+      'SyncQueueProcessor should run FIFO queue successfully when triggered',
+      () async {
+        final container = ProviderContainer();
 
-      final op2 = SyncQueueDb()
-        ..operationId = '2'
-        ..type = 'complete_activity'
-        ..payloadJson = jsonEncode({'index': 1})
-        ..timestamp = DateTime.now();
+        final op1 = SyncQueueDb()
+          ..operationId = '1'
+          ..type = 'add_expense'
+          ..payloadJson = jsonEncode({'amount': 100.0})
+          ..timestamp = DateTime.now().subtract(const Duration(seconds: 1));
 
-      await IsarService.isar.writeTxn(() async {
-        await IsarService.isar.syncQueueDbs.putAll([op1, op2]);
-      });
+        final op2 = SyncQueueDb()
+          ..operationId = '2'
+          ..type = 'complete_activity'
+          ..payloadJson = jsonEncode({'index': 1})
+          ..timestamp = DateTime.now();
 
-      final processor = container.read(syncQueueProcessorProvider);
-      await processor.triggerSync();
+        await IsarService.isar.writeTxn(() async {
+          await IsarService.isar.syncQueueDbs.putAll([op1, op2]);
+        });
 
-      final count = await IsarService.isar.syncQueueDbs.count();
-      expect(count, 0);
-    });
+        final processor = container.read(syncQueueProcessorProvider);
+        await processor.triggerSync();
+
+        final count = await IsarService.isar.syncQueueDbs.count();
+        expect(count, 0);
+      },
+    );
   });
 }

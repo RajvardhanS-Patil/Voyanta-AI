@@ -17,7 +17,7 @@ class CompanionRepositoryImpl implements CompanionRepository {
       history: history,
       context: context,
     );
-    
+
     return ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       text: responseText,
