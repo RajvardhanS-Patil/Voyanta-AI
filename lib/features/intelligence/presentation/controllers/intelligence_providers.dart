@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voyanta_ai/core/services/weather_provider.dart';
 import 'package:voyanta_ai/features/expenses/presentation/controllers/expense_controller.dart';
 import 'package:voyanta_ai/features/expenses/presentation/controllers/expense_providers.dart';
 import 'package:voyanta_ai/features/journey/presentation/controllers/journey_controller.dart';
@@ -50,17 +51,37 @@ final activeRecommendationsProvider = Provider<List<TravelRecommendation>>((
 ) {
   final journey = ref.watch(journeyControllerProvider);
   final expenses = ref.watch(expenseControllerProvider).value ?? [];
+  final tripMeta = ref.watch(tripMetaControllerProvider).value;
   final budgetCalculator = ref.watch(calculateBudgetHealthUseCaseProvider);
 
-  final budgetStatus = budgetCalculator(expenses);
+  final totalBudget = tripMeta?.totalBudget ?? 5000.0;
+  final budgetStatus = budgetCalculator(expenses, totalBudget: totalBudget);
   final engine = ref.read(recommendationEngineProvider);
 
-  // Seed default weather state to trigger proactive warning cards for demonstration
-  const weatherInfo = "Showers & Rainy";
+  // Use live weather condition string for intelligent recommendation engine
+  final liveWeather = ref.watch(destinationWeatherProvider);
+  final weatherInfo = liveWeather.value?.description ?? "Clear";
 
-  return engine.generateRecommendations(
+  final recommendations = engine.generateRecommendations(
     journeyState: journey,
     budgetStatus: budgetStatus,
     weatherInfo: weatherInfo,
   );
+  
+  // If no critical alerts are generated, provide a helpful contextual tip
+  // so the intelligence bar is always visible and useful.
+  if (recommendations.isEmpty) {
+    final title = journey.currentActivity?.title ?? journey.activeItinerary?.activities.firstOrNull?.title ?? 'Your Destination';
+    recommendations.add(
+      TravelRecommendation(
+        id: 'tip_1',
+        type: RecommendationType.nearby,
+        severity: AlertSeverity.info,
+        title: 'Enjoy $title!',
+        description: 'Conditions are perfect right now. Have a great time exploring!',
+      ),
+    );
+  }
+
+  return recommendations;
 });

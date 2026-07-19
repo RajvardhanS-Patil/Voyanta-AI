@@ -7,26 +7,26 @@ class FoodIntelligenceEngine {
     if (!journeyState.hasActiveJourney) return recommendations;
 
     final target = journeyState.currentActivity?.title ?? '';
-    if (target.contains('Central Park')) {
+    if (target.contains('Red Fort')) {
       recommendations.add(
         const TravelRecommendation(
-          id: 'food_central_park',
+          id: 'food_chandni_chowk',
           type: RecommendationType.food,
           severity: AlertSeverity.info,
-          title: 'Nearby Dining: Central Park',
+          title: 'Nearby Dining: Paranthe Wali Gali',
           description:
-              'Try "Tavern on the Green" for iconic park dining, or visit "The Loeb Boathouse" deck.',
+              'Head into the alleys of Chandni Chowk for legendary stuffed paranthas and jalebis!',
         ),
       );
-    } else if (target.contains('Empire State')) {
+    } else if (target.contains('India Gate')) {
       recommendations.add(
         const TravelRecommendation(
-          id: 'food_empire_state',
+          id: 'food_india_gate',
           type: RecommendationType.food,
           severity: AlertSeverity.info,
-          title: 'Nearby Dining: Empire State',
+          title: 'Nearby Dining: Pandara Road',
           description:
-              'Head to "Koreatown" on 32nd St for authentic barbecue spots just 2 blocks south.',
+              'A short drive away, Pandara Road offers some of the best North Indian cuisine (like Gulati) in the city.',
         ),
       );
     }

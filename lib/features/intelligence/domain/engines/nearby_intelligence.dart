@@ -7,27 +7,27 @@ class NearbyIntelligenceEngine {
     if (!journeyState.hasActiveJourney) return recommendations;
 
     final target = journeyState.currentActivity?.title ?? '';
-    if (target.contains('Empire State')) {
+    if (target.contains('India Gate')) {
       recommendations.add(
         const TravelRecommendation(
-          id: 'nearby_flatiron',
+          id: 'nearby_national_museum',
           type: RecommendationType.nearby,
           severity: AlertSeverity.info,
-          title: 'Photo Spot: Flatiron Building',
+          title: 'Nearby: National Museum',
           description:
-              'The historic architectural gem is just a 12-minute walk south down 5th Ave.',
+              'The largest museum in India is just a short 10-minute walk away down Janpath.',
           actionLabel: 'Route There',
         ),
       );
-    } else if (target.contains('Central Park')) {
+    } else if (target.contains('Red Fort')) {
       recommendations.add(
         const TravelRecommendation(
-          id: 'nearby_bethesda',
+          id: 'nearby_chandni_chowk',
           type: RecommendationType.nearby,
           severity: AlertSeverity.info,
-          title: 'Hidden Gem: Bethesda Fountain',
+          title: 'Hidden Gem: Chandni Chowk',
           description:
-              ' Bethesda Fountain and Terrace are only 250 meters ahead. Perfect scenic stop.',
+              'Step right across the street into one of the oldest and busiest markets in Old Delhi!',
         ),
       );
     }

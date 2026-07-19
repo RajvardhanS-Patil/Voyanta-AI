@@ -10,6 +10,15 @@ class MessageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.sender == MessageSender.user;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final userBgColor = isDark ? const Color(0xFF5A3EAB).withValues(alpha: 0.25) : Colors.deepPurple.withValues(alpha: 0.15);
+    final userBorderColor = isDark ? const Color(0xFF5A3EAB).withValues(alpha: 0.6) : Colors.deepPurple.withValues(alpha: 0.3);
+    
+    final aiBgColor = isDark ? const Color(0xFF1E293B).withValues(alpha: 0.45) : Colors.white.withValues(alpha: 0.85);
+    final aiBorderColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.1);
+    
+    final textColor = isDark ? Colors.white : Colors.black87;
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -30,13 +39,7 @@ class MessageCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isUser
-                    ? const Color(0xFF5A3EAB).withValues(
-                        alpha: 0.25,
-                      ) // Subtle Deep Lavender tint
-                    : const Color(
-                        0xFF1E293B,
-                      ).withValues(alpha: 0.45), // Slate Obsidian Glass
+                color: isUser ? userBgColor : aiBgColor,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(20),
                   topRight: const Radius.circular(20),
@@ -44,16 +47,14 @@ class MessageCard extends StatelessWidget {
                   bottomRight: Radius.circular(isUser ? 4 : 20),
                 ),
                 border: Border.all(
-                  color: isUser
-                      ? const Color(0xFF5A3EAB).withValues(alpha: 0.6)
-                      : Colors.white.withValues(alpha: 0.08),
+                  color: isUser ? userBorderColor : aiBorderColor,
                   width: 1,
                 ),
               ),
               child: Text(
                 message.text,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: textColor,
                   fontFamily: 'Inter',
                   fontSize: 14,
                   height: 1.5,

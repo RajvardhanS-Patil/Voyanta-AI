@@ -1,20 +1,15 @@
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:voyanta_ai/core/network/groq_client.dart';
 import '../../domain/entities/chat_message.dart';
 import '../../domain/entities/companion_context.dart';
 import 'companion_remote_datasource.dart';
 
-class GeminiCompanionDataSource implements CompanionRemoteDataSource {
-  final GenerativeModel _model;
-
-  GeminiCompanionDataSource(this._model);
-
+class GroqCompanionDataSource implements CompanionRemoteDataSource {
   @override
   Future<String> getAiResponse({
     required List<ChatMessage> history,
     required CompanionContext context,
   }) async {
-    final systemPrompt =
-        '''
+    final systemPrompt = '''
 You are "Voyanta AI", a premium, context-aware AI Travel Companion for India.
 You are assisting the user during their trip.
 
@@ -65,25 +60,30 @@ Directives:
 ''';
 
     try {
-      final List<Content> contents = [];
+      final List<Map<String, String>> messages = [];
+      messages.add({"role": "system", "content": systemPrompt});
 
-      // Add system context guide
-      contents.add(Content.system(systemPrompt));
-
-      // Append sliding window history
       for (final msg in history) {
-        if (msg.sender == MessageSender.user) {
-          contents.add(Content.text(msg.text));
-        } else {
-          contents.add(Content.model([TextPart(msg.text)]));
-        }
+        messages.add({
+          "role": msg.sender == MessageSender.user ? "user" : "assistant",
+          "content": msg.text,
+        });
       }
 
-      final response = await _model.generateContent(contents);
-      final responseText = response.text;
+      final response = await GroqClientManager.dio.post(
+        '/chat/completions',
+        data: {
+          "model": "llama-3.3-70b-versatile",
+          "messages": messages,
+          "temperature": 0.7,
+        },
+      );
+
+      final responseText = response.data['choices'][0]['message']['content'];
       if (responseText == null || responseText.isEmpty) {
         throw Exception('Generative model returned an empty response.');
       }
+      
       return responseText;
     } catch (e) {
       throw Exception('Failed to get AI companion response: $e');

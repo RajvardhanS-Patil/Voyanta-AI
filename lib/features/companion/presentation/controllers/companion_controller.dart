@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:voyanta_ai/core/database/isar_service.dart';
@@ -9,6 +10,9 @@ import 'package:voyanta_ai/features/companion/domain/usecases/get_companion_resp
 import 'package:voyanta_ai/features/expenses/presentation/controllers/expense_controller.dart';
 import 'package:voyanta_ai/features/expenses/presentation/controllers/expense_providers.dart';
 import 'package:voyanta_ai/features/journey/presentation/controllers/journey_controller.dart';
+import 'package:voyanta_ai/features/trip_planner/presentation/controllers/trip_planner_providers.dart';
+import 'package:voyanta_ai/features/trip_planner/domain/entities/trip_itinerary.dart';
+import 'package:voyanta_ai/features/trip_planner/domain/entities/activity.dart';
 import 'package:voyanta_ai/core/observability/observability_service.dart';
 import 'companion_providers.dart';
 
@@ -113,6 +117,9 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
         context: context,
       );
 
+      // Parse PLAN_UPDATE blocks from the AI response
+      _parsePlanUpdates(assistantMessage.text);
+
       // Swap out typing indicator for AI reply
       final finalMessages = state.value!
           .where((msg) => msg.id != 'typing')
@@ -137,11 +144,97 @@ class CompanionController extends AsyncNotifier<List<ChatMessage>> {
     }
   }
 
+  /// Parse [PLAN_UPDATE] JSON blocks from the AI response and push changes
+  /// into the generatedItinerariesProvider so the Planner screen updates live.
+  void _parsePlanUpdates(String responseText) {
+    final planUpdateRegex = RegExp(
+      r'\[PLAN_UPDATE\](.*?)\[/PLAN_UPDATE\]',
+      dotAll: true,
+    );
+
+    final matches = planUpdateRegex.allMatches(responseText);
+    if (matches.isEmpty) return;
+
+    for (final match in matches) {
+      try {
+        final jsonStr = match.group(1)?.trim();
+        if (jsonStr == null) continue;
+
+        final Map<String, dynamic> update = jsonDecode(jsonStr);
+        final action = update['action'] as String?;
+        final dayNumber = update['dayNumber'] as int? ?? 1;
+
+        if (action == 'add' && update['activity'] != null) {
+          final actData = update['activity'] as Map<String, dynamic>;
+          final newActivity = Activity(
+            time: actData['time'] ?? '12:00 PM',
+            title: actData['title'] ?? 'New Activity',
+            description: actData['description'] ?? '',
+            latitude: (actData['latitude'] as num?)?.toDouble() ?? 0.0,
+            longitude: (actData['longitude'] as num?)?.toDouble() ?? 0.0,
+          );
+
+          final currentItineraries = ref.read(generatedItinerariesProvider);
+          if (currentItineraries.isEmpty) {
+            // Create a new day if none exist
+            ref.read(generatedItinerariesProvider.notifier).setItineraries([
+              TripItinerary(
+                dayNumber: dayNumber,
+                theme: 'Updated Plan',
+                activities: [newActivity],
+              ),
+            ]);
+          } else {
+            // Find the matching day or add to the closest day
+            final updated = currentItineraries.map((itin) {
+              if (itin.dayNumber == dayNumber) {
+                return TripItinerary(
+                  dayNumber: itin.dayNumber,
+                  theme: itin.theme,
+                  activities: [...itin.activities, newActivity],
+                );
+              }
+              return itin;
+            }).toList();
+
+            // If no matching day found, append to first day
+            final hasMatch = currentItineraries.any(
+              (i) => i.dayNumber == dayNumber,
+            );
+            if (!hasMatch && updated.isNotEmpty) {
+              final first = updated[0];
+              updated[0] = TripItinerary(
+                dayNumber: first.dayNumber,
+                theme: first.theme,
+                activities: [...first.activities, newActivity],
+              );
+            }
+
+            ref
+                .read(generatedItinerariesProvider.notifier)
+                .setItineraries(updated);
+          }
+
+          ObservabilityService.trackEvent('plan_update_from_ai', {
+            'action': action,
+            'activity': newActivity.title,
+          });
+        }
+      } catch (e) {
+        // Silently ignore parse errors — the AI may not always format perfectly
+        ObservabilityService.logInfo('PLAN_UPDATE parse error: $e');
+      }
+    }
+  }
+
   CompanionContext _buildContext() {
     final journeyState = ref.read(journeyControllerProvider);
     final expenses = ref.read(expenseControllerProvider).value ?? [];
+    final tripMeta = ref.read(tripMetaControllerProvider).value;
     final budgetCalculator = ref.read(calculateBudgetHealthUseCaseProvider);
-    final budgetStatus = budgetCalculator(expenses);
+    
+    final totalBudget = tripMeta?.totalBudget ?? 5000.0;
+    final budgetStatus = budgetCalculator(expenses, totalBudget: totalBudget);
 
     final itinerary = journeyState.activeItinerary;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voyanta_ai/core/ux/animated_background.dart';
 import 'package:voyanta_ai/features/companion/presentation/controllers/companion_controller.dart';
 import 'package:voyanta_ai/core/ux/shimmer_loader.dart';
 import 'package:voyanta_ai/core/ux/empty_state_view.dart';
@@ -55,21 +56,24 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
   @override
   Widget build(BuildContext context) {
     final messagesAsync = ref.watch(companionControllerProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Auto scroll to bottom when new messages arrive
     ref.listen(companionControllerProvider, (previous, next) {
       _scrollToBottom();
     });
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F172A), // Slate Obsidian Base
+    return AnimatedBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black87),
+        title: Text(
           'Voyanta AI Companion',
           style: TextStyle(
-            color: Colors.white,
+            color: isDark ? Colors.white : Colors.black87,
             fontWeight: FontWeight.bold,
             fontFamily: 'Outfit',
           ),
@@ -164,12 +168,12 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: ActionChip(
-                      backgroundColor: const Color(0xFF1E293B),
-                      side: const BorderSide(color: Colors.white10),
+                      backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                      side: BorderSide(color: isDark ? Colors.white10 : Colors.black12),
                       label: Text(
                         suggestion,
-                        style: const TextStyle(
-                          color: Colors.tealAccent,
+                        style: TextStyle(
+                          color: isDark ? Colors.tealAccent : Colors.teal,
                           fontSize: 12,
                         ),
                       ),
@@ -190,17 +194,17 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E293B).withValues(alpha: 0.5),
+                        color: isDark ? const Color(0xFF1E293B).withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: Colors.white12),
+                        border: Border.all(color: isDark ? Colors.white12 : Colors.black12),
                       ),
                       child: TextField(
                         controller: _textController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
+                        style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                        decoration: InputDecoration(
                           hintText: 'Ask Voyanta anything...',
-                          hintStyle: TextStyle(color: Colors.white30),
-                          contentPadding: EdgeInsets.symmetric(
+                          hintStyle: TextStyle(color: isDark ? Colors.white30 : Colors.black38),
+                          contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
                           ),
@@ -229,6 +233,6 @@ class _CompanionScreenState extends ConsumerState<CompanionScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

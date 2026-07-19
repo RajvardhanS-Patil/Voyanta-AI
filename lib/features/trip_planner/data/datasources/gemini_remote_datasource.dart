@@ -25,8 +25,16 @@ class GeminiRemoteDataSource implements TripRemoteDataSource {
   }) async {
     final prompt =
         '''
-You are an expert travel planner. Create a $numDays day itinerary for a trip to $destination.
+You are an expert travel planner specializing in student-friendly, budget travel. 
+Create a $numDays day itinerary for a trip to $destination.
 The user is interested in: $interests. The budget level is: $budgetLevel.
+
+CRITICAL RULES FOR AI:
+1. Prioritize highly affordable, student-friendly solutions for everything.
+2. Recommend cheap and efficient travel routes (public transport, walking) instead of expensive taxis.
+3. Suggest budget stays, hostels, or safe but pocket-friendly neighborhoods.
+4. Maximize enjoyment by including cool local spots, street food, and free/discounted student attractions at the lowest possible cost.
+
 Return ONLY a valid JSON array of day objects. Do not include markdown formatting like ```json.
 Each day object must have the following schema:
 {

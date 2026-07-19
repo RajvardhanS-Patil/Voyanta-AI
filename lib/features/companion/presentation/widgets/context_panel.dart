@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:voyanta_ai/features/expenses/presentation/controllers/expense_controller.dart';
 import 'package:voyanta_ai/features/expenses/presentation/controllers/expense_providers.dart';
 import 'package:voyanta_ai/features/journey/presentation/controllers/journey_controller.dart';
+import 'package:voyanta_ai/core/services/trip_config_provider.dart';
 
 class ContextPanel extends ConsumerWidget {
   const ContextPanel({super.key});
@@ -12,13 +13,25 @@ class ContextPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final journeyState = ref.watch(journeyControllerProvider);
     final expenses = ref.watch(expenseControllerProvider).value ?? [];
+    final tripMeta = ref.watch(tripMetaControllerProvider).value;
     final budgetCalculator = ref.watch(calculateBudgetHealthUseCaseProvider);
-    final budgetStatus = budgetCalculator(expenses);
+    
+    final totalBudget = tripMeta?.totalBudget ?? 5000.0;
+    final budgetStatus = budgetCalculator(expenses, totalBudget: totalBudget);
+    final destination = ref.watch(tripConfigProvider);
 
-    final nextActivity =
-        journeyState.currentActivity?.title ?? "Empire State Building";
+    final nextActivity = journeyState.currentActivity?.title ?? "India Gate";
     final dist = journeyState.distanceToNextMeters / 1000.0;
     final eta = journeyState.etaMinutes;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final panelBg = isDark ? const Color(0xFF1E293B).withValues(alpha: 0.35) : Colors.white.withValues(alpha: 0.85);
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.1);
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subTextColor = isDark ? Colors.white54 : Colors.black54;
+    final iconColor = isDark ? Colors.white54 : Colors.black54;
+    final accentText = isDark ? Colors.tealAccent : Colors.teal;
+    final dividerColor = isDark ? Colors.white12 : Colors.black12;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -29,9 +42,9 @@ class ContextPanel extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E293B).withValues(alpha: 0.35),
+              color: panelBg,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,18 +53,18 @@ class ContextPanel extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Row(
+                    Row(
                       children: [
                         Icon(
                           Icons.dashboard_customize_outlined,
-                          color: Colors.tealAccent,
+                          color: accentText,
                           size: 18,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
                           'Voyanta Smart Context',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: textColor,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Outfit',
@@ -68,10 +81,10 @@ class ContextPanel extends ConsumerWidget {
                         color: Colors.teal.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Active Trip',
                         style: TextStyle(
-                          color: Colors.tealAccent,
+                          color: accentText,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
@@ -79,7 +92,7 @@ class ContextPanel extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const Divider(color: Colors.white12, height: 20),
+                Divider(color: dividerColor, height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -87,18 +100,18 @@ class ContextPanel extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Destination',
                             style: TextStyle(
-                              color: Colors.white54,
+                              color: subTextColor,
                               fontSize: 11,
                             ),
                           ),
                           const SizedBox(height: 2),
-                          const Text(
-                            'New York City',
+                          Text(
+                            destination.isNotEmpty ? destination : 'New Delhi',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: textColor,
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -112,18 +125,18 @@ class ContextPanel extends ConsumerWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Remaining Budget',
                             style: TextStyle(
-                              color: Colors.white54,
+                              color: subTextColor,
                               fontSize: 11,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            '\$${budgetStatus.remaining.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              color: Colors.tealAccent,
+                            '₹${budgetStatus.remaining.toStringAsFixed(2)}',
+                            style: TextStyle(
+                              color: accentText,
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),
@@ -138,17 +151,17 @@ class ContextPanel extends ConsumerWidget {
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.location_on,
-                      color: Colors.white54,
+                      color: iconColor,
                       size: 14,
                     ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
                         'Next: $nextActivity (${dist > 0 ? dist.toStringAsFixed(1) : "1.8"} km | ${eta > 0 ? eta : "12"} mins)',
-                        style: const TextStyle(
-                          color: Colors.white70,
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black87,
                           fontSize: 12,
                         ),
                         maxLines: 1,
