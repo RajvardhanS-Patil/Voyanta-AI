@@ -7,11 +7,11 @@ void main() {
     late CalculateBudgetHealthUseCase useCase;
 
     setUp(() {
-      useCase = CalculateBudgetHealthUseCase(totalBudget: 1000.0);
+      useCase = CalculateBudgetHealthUseCase();
     });
 
     test('should calculate zero spent when expenses list is empty', () {
-      final status = useCase([]);
+      final status = useCase([], totalBudget: 1000.0);
 
       expect(status.totalBudget, 1000.0);
       expect(status.currentSpent, 0.0);
@@ -32,7 +32,7 @@ void main() {
         ),
       ];
 
-      final status = useCase(expenses);
+      final status = useCase(expenses, totalBudget: 1000.0);
 
       expect(status.currentSpent, 850.0);
       expect(status.percentageSpent, 0.85);
@@ -58,7 +58,7 @@ void main() {
         ),
       ];
 
-      final status = useCase(expenses);
+      final status = useCase(expenses, totalBudget: 1000.0);
 
       expect(status.currentSpent, 1050.0);
       expect(status.remaining, -50.0);

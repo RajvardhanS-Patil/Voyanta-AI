@@ -11,28 +11,28 @@ class DemoSeeder {
       await isar.expenseDbs.clear();
       await isar.chatMessageDbs.clear();
 
-      // Inject Demo Expenses (A day in Paris)
+      // Inject Demo Expenses (A day in Jaipur)
       await isar.expenseDbs.putAll([
         ExpenseDb()
           ..expenseId = 'exp_1'
-          ..amount = 4.50
+          ..amount = 40.0
           ..category = 'Food'
           ..date = DateTime.now()
-          ..description = 'Morning Croissant at Café de Flore'
+          ..description = 'Morning chai & kachori at Rawat Mishthan Bhandar'
           ..isSynced = true,
         ExpenseDb()
           ..expenseId = 'exp_2'
-          ..amount = 25.00
+          ..amount = 250.0
           ..category = 'Transport'
           ..date = DateTime.now()
-          ..description = 'Metro Pass (3 Days)'
+          ..description = 'Auto-rickshaw to Amber Fort'
           ..isSynced = true,
         ExpenseDb()
           ..expenseId = 'exp_3'
-          ..amount = 115.00
+          ..amount = 500.0
           ..category = 'Activities'
           ..date = DateTime.now()
-          ..description = 'Louvre VIP Tour'
+          ..description = 'Amber Fort entry ticket (with guide)'
           ..isSynced = true,
       ]);
 
@@ -41,13 +41,13 @@ class DemoSeeder {
         ChatMessageDb()
           ..messageId = 'msg_1'
           ..text =
-              'Hello! I am in Paris and have a free afternoon. Any hidden gems near Le Marais?'
+              'Hello! I am in Jaipur and have a free afternoon. Any hidden gems near Hawa Mahal?'
           ..sender = 'user'
           ..timestamp = DateTime.now().subtract(const Duration(minutes: 5)),
         ChatMessageDb()
           ..messageId = 'msg_2'
           ..text =
-              'Le Marais is fantastic! Since you have 3 hours free, I highly recommend visiting the Musée Picasso. It is less crowded than the Louvre and set in a beautiful 17th-century hôtel particulier. Would you like me to add it to your itinerary?'
+              'Great choice! Since you are near Hawa Mahal, I highly recommend visiting Jantar Mantar — it is just a 5-minute walk away. The astronomical instruments are fascinating and it is a UNESCO World Heritage Site. Would you like me to add it to your itinerary?'
           ..sender = 'assistant'
           ..timestamp = DateTime.now().subtract(const Duration(minutes: 4)),
       ]);

@@ -41,16 +41,16 @@ class EmptyStateView extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             Text(
               description,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.white60,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white60 : Colors.black54,
                 height: 1.5,
               ),
             ),
@@ -59,8 +59,8 @@ class EmptyStateView extends StatelessWidget {
               ElevatedButton(
                 onPressed: onPrimaryAction,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.tealAccent,
-                  foregroundColor: Colors.black,
+                  backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.tealAccent : Colors.teal,
+                  foregroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
                     vertical: 16,

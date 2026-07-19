@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 
 class ShimmerLoader extends StatefulWidget {
   final Widget child;
-  final Color baseColor;
-  final Color highlightColor;
+  final Color? baseColor;
+  final Color? highlightColor;
   final Duration duration;
 
   const ShimmerLoader({
     super.key,
     required this.child,
-    this.baseColor = const Color(0xFF1E293B),
-    this.highlightColor = const Color(0xFF334155),
+    this.baseColor,
+    this.highlightColor,
     this.duration = const Duration(milliseconds: 1500),
   });
 
@@ -37,6 +37,13 @@ class _ShimmerLoaderState extends State<ShimmerLoader>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final defaultBase = isDark ? const Color(0xFF1E293B) : Colors.grey[300]!;
+    final defaultHighlight = isDark ? const Color(0xFF334155) : Colors.grey[100]!;
+
+    final base = widget.baseColor ?? defaultBase;
+    final highlight = widget.highlightColor ?? defaultHighlight;
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -45,9 +52,9 @@ class _ShimmerLoaderState extends State<ShimmerLoader>
           shaderCallback: (bounds) {
             return LinearGradient(
               colors: [
-                widget.baseColor,
-                widget.highlightColor,
-                widget.baseColor,
+                base,
+                highlight,
+                base,
               ],
               stops: const [0.1, 0.5, 0.9],
               begin: const Alignment(-1.0, -0.3),

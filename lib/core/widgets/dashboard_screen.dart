@@ -33,23 +33,39 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Colors.black : const Color(0xFFF8FAFC);
+    final navBgColor = isDark ? const Color(0xFF0F172A) : Colors.white;
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.1)
+        : Colors.black.withValues(alpha: 0.06);
+    final selectedColor = isDark ? Colors.tealAccent : const Color(0xFF0D9488);
+    final unselectedColor = isDark ? Colors.white54 : const Color(0xFF94A3B8);
+
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: bgColor,
       body: child,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF0F172A),
-          border: Border(
-            top: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-          ),
+          color: navBgColor,
+          border: Border(top: BorderSide(color: borderColor)),
+          boxShadow: isDark
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
         ),
         child: BottomNavigationBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
           type: BottomNavigationBarType.fixed,
           currentIndex: _calculateSelectedIndex(context),
-          selectedItemColor: Colors.tealAccent,
-          unselectedItemColor: Colors.white54,
+          selectedItemColor: selectedColor,
+          unselectedItemColor: unselectedColor,
           onTap: (index) => _onItemTapped(index, context),
           items: const [
             BottomNavigationBarItem(

@@ -2,11 +2,9 @@ import '../entities/expense.dart';
 import '../entities/budget_status.dart';
 
 class CalculateBudgetHealthUseCase {
-  final double totalBudget;
+  CalculateBudgetHealthUseCase();
 
-  CalculateBudgetHealthUseCase({required this.totalBudget});
-
-  BudgetStatus call(List<Expense> expenses) {
+  BudgetStatus call(List<Expense> expenses, {required double totalBudget}) {
     double totalSpent = 0;
     for (var expense in expenses) {
       totalSpent += expense.amount;

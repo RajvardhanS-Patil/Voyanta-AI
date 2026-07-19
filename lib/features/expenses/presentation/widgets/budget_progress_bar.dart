@@ -23,7 +23,7 @@ class BudgetProgressBar extends StatelessWidget {
           children: [
             const Text('Total Budget', style: TextStyle(color: Colors.white70)),
             Text(
-              '\$${status.currentSpent.toStringAsFixed(2)} / \$${status.totalBudget.toStringAsFixed(2)}',
+              '₹${status.currentSpent.toStringAsFixed(2)} / ₹${status.totalBudget.toStringAsFixed(2)}',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
