@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voyanta_ai/core/ux/animated_background.dart';
 import '../widgets/itinerary_map_view.dart';
 import '../../../trip_planner/domain/entities/trip_itinerary.dart';
 import '../../../trip_planner/domain/entities/activity.dart';
@@ -23,21 +24,21 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
           .loadItinerary(
             const TripItinerary(
               dayNumber: 1,
-              theme: 'City Highlights',
+              theme: 'Delhi Highlights',
               activities: [
                 Activity(
                   time: '10:00 AM',
-                  title: 'Empire State Building',
+                  title: 'India Gate',
                   description: 'Observation deck',
-                  latitude: 40.7484,
-                  longitude: -73.9857,
+                  latitude: 28.6129,
+                  longitude: 77.2295,
                 ),
                 Activity(
                   time: '1:00 PM',
-                  title: 'Central Park',
+                  title: 'Red Fort',
                   description: 'Lunch and walk',
-                  latitude: 40.7812,
-                  longitude: -73.9665,
+                  latitude: 28.6562,
+                  longitude: 77.2410,
                 ),
               ],
             ),
@@ -47,18 +48,21 @@ class _TripMapScreenState extends ConsumerState<TripMapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
+    return AnimatedBackground(
+      child: Scaffold(
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'Trip Map',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text(
+            'Trip Map',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        body: const ItineraryMapView(),
       ),
-      body: const ItineraryMapView(),
     );
   }
 }

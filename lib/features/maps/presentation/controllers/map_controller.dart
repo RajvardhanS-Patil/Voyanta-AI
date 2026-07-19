@@ -1,25 +1,40 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:latlong2/latlong.dart';
 import '../../../trip_planner/domain/entities/trip_itinerary.dart';
 
+class MapMarker {
+  final LatLng point;
+  final String title;
+  final int colorValue;
+  final double size;
+  final String prefix;
+
+  const MapMarker({
+    required this.point,
+    required this.title,
+    this.colorValue = 0xFFFFFFFF,
+    this.size = 1.5,
+    this.prefix = '',
+  });
+}
+
 class MapState {
-  final List<PointAnnotationOptions> annotations;
-  final CameraOptions? cameraOptions;
+  final List<MapMarker> markers;
+  final LatLng? center;
+  final double zoom;
 
-  const MapState({this.annotations = const [], this.cameraOptions});
+  const MapState({this.markers = const [], this.center, this.zoom = 12.0});
 
-  MapState copyWith({
-    List<PointAnnotationOptions>? annotations,
-    CameraOptions? cameraOptions,
-  }) {
+  MapState copyWith({List<MapMarker>? markers, LatLng? center, double? zoom}) {
     return MapState(
-      annotations: annotations ?? this.annotations,
-      cameraOptions: cameraOptions ?? this.cameraOptions,
+      markers: markers ?? this.markers,
+      center: center ?? this.center,
+      zoom: zoom ?? this.zoom,
     );
   }
 }
 
-class MapController extends Notifier<MapState> {
+class VoyantaMapController extends Notifier<MapState> {
   @override
   MapState build() {
     return const MapState();
@@ -28,30 +43,23 @@ class MapController extends Notifier<MapState> {
   void loadItinerary(TripItinerary itinerary) {
     if (itinerary.activities.isEmpty) return;
 
-    final annotations = itinerary.activities.map((activity) {
-      return PointAnnotationOptions(
-        geometry: Point(
-          coordinates: Position(activity.longitude, activity.latitude),
-        ),
-        textField: activity.title,
-        textColor: 0xFFFFFFFF,
-        iconImage: 'marker-15', // Default mapbox marker
-        iconSize: 1.5,
+    final markers = itinerary.activities.map((activity) {
+      return MapMarker(
+        point: LatLng(activity.latitude, activity.longitude),
+        title: activity.title,
       );
     }).toList();
 
-    // Center camera on first activity
     final first = itinerary.activities.first;
-    final camera = CameraOptions(
-      center: Point(coordinates: Position(first.longitude, first.latitude)),
+    state = state.copyWith(
+      markers: markers,
+      center: LatLng(first.latitude, first.longitude),
       zoom: 12.0,
-      pitch: 45.0, // 3D aesthetic tilt
     );
-
-    state = state.copyWith(annotations: annotations, cameraOptions: camera);
   }
 }
 
-final mapControllerProvider = NotifierProvider<MapController, MapState>(() {
-  return MapController();
+final mapControllerProvider =
+    NotifierProvider<VoyantaMapController, MapState>(() {
+  return VoyantaMapController();
 });

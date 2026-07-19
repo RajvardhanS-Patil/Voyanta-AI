@@ -1,18 +1,22 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:voyanta_ai/core/services/weather_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io' show Platform;
 
 import 'package:voyanta_ai/features/maps/presentation/widgets/itinerary_map_view.dart';
 import 'package:voyanta_ai/features/journey/domain/entities/journey_state.dart';
 import 'package:voyanta_ai/features/journey/presentation/controllers/journey_controller.dart';
-import 'package:voyanta_ai/features/trip_planner/domain/entities/trip_itinerary.dart';
 import 'package:voyanta_ai/features/trip_planner/domain/entities/activity.dart';
 import 'package:voyanta_ai/features/intelligence/presentation/controllers/intelligence_providers.dart';
 import 'package:voyanta_ai/features/intelligence/presentation/widgets/recommendation_card.dart';
+import 'package:voyanta_ai/core/theme/theme_provider.dart';
 import 'package:voyanta_ai/core/widgets/sync_status_banner.dart';
-import 'package:voyanta_ai/core/ux/voyanta_button.dart';
+import 'package:voyanta_ai/core/utils/city_search.dart';
+import 'package:voyanta_ai/core/ux/animated_background.dart';
+import 'package:voyanta_ai/core/services/trip_config_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class LiveJourneyScreen extends ConsumerStatefulWidget {
   const LiveJourneyScreen({super.key});
@@ -21,56 +25,83 @@ class LiveJourneyScreen extends ConsumerStatefulWidget {
   ConsumerState<LiveJourneyScreen> createState() => _LiveJourneyScreenState();
 }
 
-class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
-  // Demo itinerary to seed the engine
-  static const _testItinerary = TripItinerary(
-    dayNumber: 1,
-    theme: 'Manhattan Skyline & Park Tour',
-    activities: [
-      Activity(
-        time: '10:00 AM',
-        title: 'Empire State Building',
-        description: 'Take in the 360-degree observation deck views.',
-        latitude: 40.7484,
-        longitude: -73.9857,
-      ),
-      Activity(
-        time: '1:00 PM',
-        title: 'Central Park Carousel',
-        description: 'Relaxing ride and stroll through the mall.',
-        latitude: 40.7712,
-        longitude: -73.9725,
-      ),
-      Activity(
-        time: '4:00 PM',
-        title: 'Metropolitan Museum of Art',
-        description: 'Explore historical exhibits and rooftop sculptures.',
-        latitude: 40.7794,
-        longitude: -73.9632,
-      ),
-    ],
-  );
+class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen>
+    with TickerProviderStateMixin {
+  final _destinationController = TextEditingController();
+  late AnimationController _bgAnimController;
+  bool _isFullscreen = false;
+
+  // Popular India destinations for quick-pick cards
+  static const _popularDestinations = [
+    _DestinationCard(
+      name: 'Goa',
+      tagline: 'Beaches & Nightlife',
+      icon: Icons.beach_access_rounded,
+      gradient: [Color(0xFF0EA5E9), Color(0xFF06B6D4)],
+    ),
+    _DestinationCard(
+      name: 'Jaipur',
+      tagline: 'Heritage & Forts',
+      icon: Icons.account_balance_rounded,
+      gradient: [Color(0xFFEC4899), Color(0xFFF43F5E)],
+    ),
+    _DestinationCard(
+      name: 'Kerala',
+      tagline: 'Backwaters & Nature',
+      icon: Icons.forest_rounded,
+      gradient: [Color(0xFF10B981), Color(0xFF059669)],
+    ),
+    _DestinationCard(
+      name: 'Varanasi',
+      tagline: 'Spirituality & Culture',
+      icon: Icons.temple_hindu_rounded,
+      gradient: [Color(0xFFF59E0B), Color(0xFFEF4444)],
+    ),
+    _DestinationCard(
+      name: 'Udaipur',
+      tagline: 'Lakes & Palaces',
+      icon: Icons.castle_rounded,
+      gradient: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+    ),
+    _DestinationCard(
+      name: 'Manali',
+      tagline: 'Mountains & Adventure',
+      icon: Icons.landscape_rounded,
+      gradient: [Color(0xFF14B8A6), Color(0xFF0D9488)],
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _bgAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _destinationController.dispose();
+    _bgAnimController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Only rebuild LiveJourneyScreen when hasActiveJourney changes
     final hasActiveJourney = ref.watch(
       journeyControllerProvider.select((state) => state.hasActiveJourney),
     );
-    final recommendations = ref.watch(activeRecommendationsProvider);
 
-    // If journey is not active, display the Start Dashboard / Permissions controller
     if (!hasActiveJourney) {
-      final journeyState = ref.read(
-        journeyControllerProvider,
-      ); // read once for start screen
+      final journeyState = ref.read(journeyControllerProvider);
       return _buildStartScreen(journeyState);
     }
 
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
+      appBar: _isFullscreen ? null : AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: const Icon(Icons.location_on, color: Colors.tealAccent),
@@ -98,172 +129,499 @@ class _LiveJourneyScreenState extends ConsumerState<LiveJourneyScreen> {
       ),
       body: Stack(
         children: [
-          // Underlying Mapbox Canvas
           const ItineraryMapView(),
-
-          // Connectivity / action queue sync status banner
-          const Positioned(
-            top: 100,
-            left: 16,
+          
+          // Fullscreen Toggle Button
+          Positioned(
+            top: _isFullscreen ? 50 : 100,
             right: 16,
-            child: SyncStatusBanner(),
-          ),
-
-          // Proactive Travel Intelligence Recommendations
-          if (recommendations.isNotEmpty)
-            Positioned(
-              bottom: 335,
-              left: 0,
-              right: 0,
-              child: SizedBox(
-                height: 120,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  itemCount: recommendations.length,
-                  itemBuilder: (context, index) {
-                    return RecommendationCard(
-                      recommendation: recommendations[index],
-                    );
-                  },
-                ),
+            child: FloatingActionButton.small(
+              backgroundColor: Colors.black54,
+              child: Icon(
+                _isFullscreen ? Icons.fullscreen_exit : Icons.fullscreen,
+                color: Colors.white,
               ),
+              onPressed: () {
+                setState(() {
+                  _isFullscreen = !_isFullscreen;
+                });
+              },
             ),
-
-          // Glassmorphic status panel
-          const Positioned(
-            bottom: 160,
-            left: 16,
-            right: 16,
-            child: _ActiveJourneyGlassPanel(),
           ),
-
-          // Draggable Bottom Timeline & Trip Progress Indicator
-          const _DraggableTimelineSheet(),
+          
+          if (!_isFullscreen) ...[
+            const Positioned(
+              top: 100,
+              left: 16,
+              right: 64, // leave room for FAB
+              child: SyncStatusBanner(),
+            ),
+            const Positioned(
+              bottom: 160,
+              left: 16,
+              right: 16,
+              child: _ActiveJourneyGlassPanel(),
+            ),
+            const _DraggableTimelineSheet(),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildStartScreen(JourneyState state) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.explore_outlined,
-                  color: Colors.tealAccent,
-                  size: 80,
-                ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Live Journey Engine',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Outfit',
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Transform your static travel plan into a real-time guided tour with automatic arrival alerts and live GPS tracking.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    fontFamily: 'Inter',
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 32),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
+    final cardColor = isDark
+        ? Colors.white.withValues(alpha: 0.05)
+        : Colors.white.withValues(alpha: 0.85);
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtextColor = isDark ? Colors.white70 : const Color(0xFF475569);
 
-                // Graceful Permission Warning overlay if location check failed
-                if (state.permissionDenied)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 24),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.redAccent.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.redAccent.withValues(alpha: 0.5),
-                      ),
-                    ),
-                    child: const Column(
+    return Scaffold(
+      backgroundColor: bgColor,
+      body: Stack(
+        children: [
+          // Animated floating orbs background
+          const AnimatedBackground(child: SizedBox.expand()),
+
+          // Main content
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top bar with logo and theme toggle
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
                             Icon(
-                              Icons.warning_amber_rounded,
-                              color: Colors.redAccent,
+                              Icons.explore,
+                              color: isDark
+                                  ? Colors.tealAccent
+                                  : const Color(0xFF0D9488),
+                              size: 32,
                             ),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 12),
                             Text(
-                              'Location Access Denied',
+                              'Voyanta AI',
                               style: TextStyle(
-                                color: Colors.redAccent,
+                                color: textColor,
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: 'Outfit',
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Voyanta requires background & foreground GPS permission to animate your route and trigger geofence arrivals. Please enable it in settings or click Grant below.',
-                          style: TextStyle(color: Colors.white70, fontSize: 12),
+                        // Dark/Light mode toggle
+                        Container(
+                          decoration: BoxDecoration(
+                            color: cardColor,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.1)
+                                  : Colors.black.withValues(alpha: 0.08),
+                            ),
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                              isDark
+                                  ? Icons.light_mode_rounded
+                                  : Icons.dark_mode_rounded,
+                              color: isDark
+                                  ? Colors.amber
+                                  : const Color(0xFF475569),
+                            ),
+                            onPressed: () {
+                              ref.read(themeModeProvider.notifier).toggle();
+                            },
+                          ),
                         ),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: 32),
 
-                // Background location support notice
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  margin: const EdgeInsets.only(bottom: 32),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.1),
+                    // Hero heading
+                    Text(
+                      'Where are you\ntravelling to?',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Outfit',
+                        height: 1.2,
+                      ),
                     ),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.security, color: Colors.tealAccent, size: 20),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Equipped with background tracking capabilities. Voyanta safely monitors progress even when your screen is locked.',
-                          style: TextStyle(color: Colors.white60, fontSize: 12),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Enter your destination and let AI plan the perfect trip.',
+                      style: TextStyle(
+                        color: subtextColor,
+                        fontSize: 14,
+                        fontFamily: 'Inter',
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Destination input card
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.08),
+                        ),
+                        boxShadow: isDark
+                            ? []
+                            : [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.06),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 12),
+                          Icon(
+                            Icons.location_on_outlined,
+                            color: isDark
+                                ? Colors.tealAccent
+                                : const Color(0xFF0D9488),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Autocomplete<String>(
+                              optionsBuilder: (TextEditingValue textEditingValue) {
+                                if (textEditingValue.text.isEmpty) {
+                                  return const Iterable<String>.empty();
+                                }
+                                return searchCities(textEditingValue.text, maxResults: 15);
+                              },
+                              onSelected: (String selection) {
+                                _destinationController.text = selection;
+                                _navigateToPlanner();
+                              },
+                              fieldViewBuilder: (BuildContext context,
+                                  TextEditingController fieldTextEditingController,
+                                  FocusNode fieldFocusNode,
+                                  VoidCallback onFieldSubmitted) {
+                                // Bind external controller
+                                if (fieldTextEditingController.text.isEmpty && _destinationController.text.isNotEmpty) {
+                                  fieldTextEditingController.text = _destinationController.text;
+                                }
+                                fieldTextEditingController.addListener(() {
+                                  _destinationController.text = fieldTextEditingController.text;
+                                });
+
+                                return TextField(
+                                  controller: fieldTextEditingController,
+                                  focusNode: fieldFocusNode,
+                                  style: TextStyle(color: textColor),
+                                  decoration: InputDecoration(
+                                    hintText: 'e.g. Goa, Jaipur, Mumbai...',
+                                    hintStyle: TextStyle(
+                                      color: subtextColor.withValues(alpha: 0.5),
+                                    ),
+                                    border: InputBorder.none,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                  ),
+                                  onSubmitted: (_) {
+                                    onFieldSubmitted();
+                                    _navigateToPlanner();
+                                  },
+                                );
+                              },
+                              optionsViewBuilder: (context, onSelected, options) {
+                                return Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Material(
+                                    elevation: 4.0,
+                                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width - 150, // Account for padding and button
+                                      height: 200,
+                                      child: ListView.builder(
+                                        padding: const EdgeInsets.all(8.0),
+                                        itemCount: options.length,
+                                        itemBuilder: (BuildContext context, int index) {
+                                          final String option = options.elementAt(index);
+                                          return GestureDetector(
+                                            onTap: () {
+                                              onSelected(option);
+                                            },
+                                            child: ListTile(
+                                              title: Text(
+                                                option,
+                                                style: TextStyle(color: textColor),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.all(4),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isDark
+                                    ? Colors.tealAccent
+                                    : const Color(0xFF0D9488),
+                                foregroundColor: isDark
+                                    ? Colors.black
+                                    : Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 14,
+                                ),
+                              ),
+                              onPressed: _navigateToPlanner,
+                              child: const Text(
+                                'Plan Trip',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Popular destinations section
+                    Text(
+                      'Popular Destinations',
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Outfit',
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Tap to explore with AI-powered planning',
+                      style: TextStyle(color: subtextColor, fontSize: 13),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Destination cards grid
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 1.6,
+                          ),
+                      itemCount: _popularDestinations.length,
+                      itemBuilder: (context, index) {
+                        final dest = _popularDestinations[index];
+                        return _buildDestinationCard(
+                          dest,
+                          isDark,
+                          cardColor,
+                          textColor,
+                          subtextColor,
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Permission Warning
+                    if (state.permissionDenied)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 24),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: Colors.redAccent.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        child: const Column(
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.warning_amber_rounded,
+                                  color: Colors.redAccent,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Location Access Denied',
+                                  style: TextStyle(
+                                    color: Colors.redAccent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Voyanta requires GPS permission to animate your route and trigger geofence arrivals. Please enable it in settings.',
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+
+                    // Background tracking notice
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : Colors.black.withValues(alpha: 0.06),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.security,
+                            color: isDark
+                                ? Colors.tealAccent
+                                : const Color(0xFF0D9488),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Equipped with background tracking. Voyanta monitors progress even when your screen is locked.',
+                              style: TextStyle(
+                                color: subtextColor,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToPlanner() {
+    final dest = _destinationController.text.trim();
+    if (dest.isEmpty) return;
+    ref.read(tripConfigProvider.notifier).setDestination(dest);
+    // Navigate to planner tab
+    context.go('/planner');
+  }
+
+  Widget _buildDestinationCard(
+    _DestinationCard dest,
+    bool isDark,
+    Color cardColor,
+    Color textColor,
+    Color subtextColor,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        _destinationController.text = dest.name;
+        _navigateToPlanner();
+      },
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              dest.gradient[0].withValues(alpha: isDark ? 0.25 : 0.12),
+              dest.gradient[1].withValues(alpha: isDark ? 0.10 : 0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: dest.gradient[0].withValues(alpha: isDark ? 0.3 : 0.2),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Icon(dest.icon, color: dest.gradient[0], size: 28),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  dest.name,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Outfit',
                   ),
                 ),
-
-                VoyantaButton(
-                  label: 'Start Journey',
-                  onPressed: () {
-                    ref
-                        .read(journeyControllerProvider.notifier)
-                        .startJourney(_testItinerary);
-                  },
+                Text(
+                  dest.tagline,
+                  style: TextStyle(color: subtextColor, fontSize: 11),
                 ),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
+class _DestinationCard {
+  final String name;
+  final String tagline;
+  final IconData icon;
+  final List<Color> gradient;
+
+  const _DestinationCard({
+    required this.name,
+    required this.tagline,
+    required this.icon,
+    required this.gradient,
+  });
+}
+
+// ─── Animated Background Painter ─────────────────────────────────
+
+
+// ─── Active Journey Glass Panel ──────────────────────────────────
 class _ActiveJourneyGlassPanel extends ConsumerWidget {
   const _ActiveJourneyGlassPanel();
 
@@ -286,7 +644,14 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(journeyControllerProvider);
+    final weatherState = ref.watch(destinationWeatherProvider);
     if (state.currentActivity == null) return const SizedBox.shrink();
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassColor = isDark ? Colors.black.withValues(alpha: 0.65) : Colors.white.withValues(alpha: 0.85);
+    final borderColor = isDark ? Colors.white.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.1);
+    final textColor = isDark ? Colors.white : Colors.black87;
+    final subTextColor = isDark ? Colors.white70 : Colors.black54;
 
     final isArrived = state.status == JourneyStatus.arrived;
     final activity = state.currentActivity!;
@@ -297,9 +662,9 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.65),
+            color: glassColor,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            border: Border.all(color: borderColor),
             boxShadow: [
               BoxShadow(
                 color: Colors.teal.withValues(alpha: 0.15),
@@ -311,12 +676,33 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (weatherState.value != null && weatherState.value!.description.toLowerCase().contains('rain'))
+                Container(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blueAccent.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent, size: 16),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Weather Alert: ${weatherState.value!.description} (${weatherState.value!.temperatureC}°C)',
+                        style: TextStyle(color: textColor, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
               Text(
                 isArrived
                     ? '🎯 ARRIVED AT DESTINATION'
                     : '⏳ ACTIVE ROUTE STATE',
                 style: TextStyle(
-                  color: isArrived ? Colors.tealAccent : Colors.white54,
+                  color: isArrived ? (isDark ? Colors.tealAccent : Colors.teal) : subTextColor,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
                   fontSize: 12,
@@ -325,8 +711,8 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
               const SizedBox(height: 8),
               Text(
                 activity.title,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: textColor,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -335,7 +721,7 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
               const SizedBox(height: 4),
               Text(
                 '${(state.distanceToNextMeters / 1000).toStringAsFixed(2)} km away • ETA: ${state.etaMinutes} mins',
-                style: const TextStyle(color: Colors.white70, fontSize: 13),
+                style: TextStyle(color: subTextColor, fontSize: 13),
               ),
               const SizedBox(height: 16),
               Row(
@@ -363,8 +749,8 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
                     Expanded(
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white12,
-                          foregroundColor: Colors.white,
+                          backgroundColor: isDark ? Colors.white12 : Colors.black12,
+                          foregroundColor: textColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -390,6 +776,7 @@ class _ActiveJourneyGlassPanel extends ConsumerWidget {
   }
 }
 
+// ─── Draggable Timeline Sheet ────────────────────────────────────
 class _DraggableTimelineSheet extends ConsumerWidget {
   const _DraggableTimelineSheet();
 
@@ -412,19 +799,25 @@ class _DraggableTimelineSheet extends ConsumerWidget {
       minChildSize: 0.18,
       maxChildSize: 0.55,
       builder: (context, scrollController) {
+        final recommendations = ref.watch(activeRecommendationsProvider);
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        final sheetColor = isDark ? const Color(0xFF1E293B).withValues(alpha: 0.9) : Colors.white.withValues(alpha: 0.95);
+        final borderColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08);
+        final textColor = isDark ? Colors.white : Colors.black87;
+        final handleColor = isDark ? Colors.white30 : Colors.black26;
+        final trackBgColor = isDark ? Colors.white10 : Colors.black12;
+        
         return ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(
-                  0xFF1E293B,
-                ).withValues(alpha: 0.9), // Glass panel
+                color: sheetColor,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(24),
                 ),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                border: Border.all(color: borderColor),
               ),
               child: ListView(
                 controller: scrollController,
@@ -433,36 +826,50 @@ class _DraggableTimelineSheet extends ConsumerWidget {
                   vertical: 12,
                 ),
                 children: [
-                  // Center drag indicator line
                   Align(
                     alignment: Alignment.center,
                     child: Container(
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.white30,
+                        color: handleColor,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Progress Bar Block
+                  
+                  if (recommendations.isNotEmpty) ...[
+                    SizedBox(
+                      height: 120,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: recommendations.length,
+                        itemBuilder: (context, index) {
+                          return RecommendationCard(
+                            recommendation: recommendations[index],
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                  
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Journey Timeline',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: textColor,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
                       Text(
                         '$completedCount / $totalActivities completed',
-                        style: const TextStyle(
-                          color: Colors.tealAccent,
+                        style: TextStyle(
+                          color: isDark ? Colors.tealAccent : Colors.teal,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -474,14 +881,12 @@ class _DraggableTimelineSheet extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progressFraction,
-                      backgroundColor: Colors.white10,
-                      color: Colors.tealAccent,
+                      backgroundColor: trackBgColor,
+                      color: isDark ? Colors.tealAccent : Colors.teal,
                       minHeight: 6,
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Timeline activities checklist
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -492,6 +897,7 @@ class _DraggableTimelineSheet extends ConsumerWidget {
                       final isActive = index == currentActivityIndex;
 
                       return _buildTimelineItem(
+                        context,
                         act,
                         isCompleted,
                         isActive,
@@ -509,29 +915,33 @@ class _DraggableTimelineSheet extends ConsumerWidget {
   }
 
   Widget _buildTimelineItem(
+    BuildContext context,
     Activity activity,
     bool isCompleted,
     bool isActive,
     bool isLast,
   ) {
-    Color dotColor = Colors.white24;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    Color dotColor = isDark ? Colors.white24 : Colors.black26;
     IconData icon = Icons.circle_outlined;
-    TextStyle titleStyle = const TextStyle(color: Colors.white70, fontSize: 14);
-
+    TextStyle titleStyle = TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 15, fontWeight: FontWeight.bold);
+    
     if (isCompleted) {
-      dotColor = Colors.tealAccent;
+      dotColor = isDark ? Colors.tealAccent : Colors.teal;
       icon = Icons.check_circle;
-      titleStyle = const TextStyle(
-        color: Colors.white38,
-        fontSize: 14,
+      titleStyle = TextStyle(
+        color: isDark ? Colors.white38 : Colors.black38,
+        fontSize: 15,
+        fontWeight: FontWeight.bold,
         decoration: TextDecoration.lineThrough,
       );
     } else if (isActive) {
-      dotColor = Colors.purpleAccent;
+      dotColor = isDark ? Colors.purpleAccent : Colors.purple;
       icon = Icons.gps_fixed;
-      titleStyle = const TextStyle(
-        color: Colors.white,
-        fontSize: 14,
+      titleStyle = TextStyle(
+        color: isDark ? Colors.white : Colors.black87,
+        fontSize: 16,
         fontWeight: FontWeight.bold,
       );
     }
@@ -540,59 +950,64 @@ class _DraggableTimelineSheet extends ConsumerWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left timeline visual track
           Column(
             children: [
-              Icon(icon, color: dotColor, size: 20),
+              Icon(icon, color: dotColor, size: 24),
               if (!isLast)
                 Expanded(
                   child: Container(
-                    width: 2,
-                    color: isCompleted ? Colors.tealAccent : Colors.white12,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    width: 3,
+                    color: isCompleted ? (isDark ? Colors.tealAccent.withValues(alpha: 0.6) : Colors.teal.withValues(alpha: 0.6)) : (isDark ? Colors.white12 : Colors.black12),
+                    margin: const EdgeInsets.symmetric(vertical: 6),
                   ),
                 ),
             ],
           ),
           const SizedBox(width: 16),
-
-          // Content body
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        activity.title,
-                        style: titleStyle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '📍 Checkpoint',
+                        style: TextStyle(
+                          color: isActive ? Colors.purpleAccent : Colors.white54,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.1,
+                        ),
                       ),
-                    ),
-                    Text(
-                      activity.time,
-                      style: TextStyle(
-                        color: isActive ? Colors.purpleAccent : Colors.white30,
-                        fontSize: 12,
-                        fontWeight: isActive
-                            ? FontWeight.bold
-                            : FontWeight.normal,
+                      Text(
+                        activity.time,
+                        style: TextStyle(
+                          color: isActive ? Colors.purpleAccent : Colors.white54,
+                          fontSize: 12,
+                          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                        ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    activity.title,
+                    style: titleStyle,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    activity.description,
+                    style: TextStyle(
+                      color: isActive ? Colors.white70 : Colors.white38,
+                      fontSize: 13,
+                      height: 1.4,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  activity.description,
-                  style: const TextStyle(color: Colors.white54, fontSize: 11),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 16),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],

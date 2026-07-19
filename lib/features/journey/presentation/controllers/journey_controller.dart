@@ -133,6 +133,11 @@ class JourneyController extends Notifier<JourneyState> {
     final lastKnown = await _locationRepo.getLastKnownPosition();
     if (lastKnown != null) {
       _updateStateWithPosition(lastKnown);
+    } else {
+      try {
+        final current = await Geolocator.getCurrentPosition();
+        _updateStateWithPosition(current);
+      } catch (_) {}
     }
 
     _positionSubscription?.cancel();
